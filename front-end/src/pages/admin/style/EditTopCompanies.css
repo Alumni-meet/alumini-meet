@@ -318,7 +318,7 @@ h2 {
     max-width: 600px;
     width: 90%;
     position: relative;
-    z-index: 1001;
+    z-index: 1000;
     max-height: 80vh;
     overflow-y: auto;
 }

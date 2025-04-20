@@ -13,6 +13,13 @@ function arrayBufferToBase64(buffer: number[]): string {
   return window.btoa(binary);
 }
 
+interface Follower {
+  _id: string;
+  name: string;
+  dept: string;
+  batch: string;
+}
+
 interface Group {
   _id: string;
   groupTitle: string;
@@ -32,13 +39,76 @@ interface Group {
   }[];
 }
 
+const FollowersDialog = ({
+  groupId,
+  onClose,
+}: {
+  groupId: string;
+  onClose: () => void;
+}) => {
+  const [followers, setFollowers] = useState<Follower[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      try {
+        const response = await axios.get(
+          `${mainUrlPrefix}/mentorship/followers/${groupId}`
+        );
+        setFollowers(response.data);
+      } catch (error) {
+        console.error("Error fetching followers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (groupId) {
+      fetchFollowers();
+    }
+  }, [groupId]);
+
+  return (
+    <div className="dialog-overlay" onClick={onClose}>
+      <dialog
+        open
+        className="mentor-dialog-box"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="dialog-header">
+          <h2>Followers</h2>
+          <button onClick={onClose} className="close-button">
+            &times;
+          </button>
+        </div>
+        <div className="followers-list">
+          {loading ? (
+            <p>Loading followers...</p>
+          ) : followers.length > 0 ? (
+            followers.map((follower) => (
+              <div key={follower._id} className="follower-item">
+                <h3>{follower.name}</h3>
+                <p>Department: {follower.dept}</p>
+                <p>Batch: {follower.batch}</p>
+              </div>
+            ))
+          ) : (
+            <p>No followers yet</p>
+          )}
+        </div>
+      </dialog>
+    </div>
+  );
+};
+
 export default function Mentorship() {
-  const [community, setCommunity] = useState([]);
-  const [following, setFollowing] = useState([]);
+  const [community, setCommunity] = useState<Group[]>([]);
+  const [following, setFollowing] = useState<Group[]>([]);
   const userId = sessionStorage.getItem("user")!;
   const role = sessionStorage.getItem("role")!;
   const [currentPage, setCurrentPage] = useState("explore");
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [showFollowersDialog, setShowFollowersDialog] = useState(false);
 
   // Post State
   const [showPostForm, setShowPostForm] = useState(false);
@@ -69,7 +139,9 @@ export default function Mentorship() {
       } else {
         setCommunity(response.data.mentorshipGroups);
       }
-      console.log("Fetched groups:", response.data);
+      if (response.data.message == "No mentorship groups found for this user") {
+        setCommunity([]);
+      }
     } catch (e) {
       console.error("Error fetching mentorship groups:", e);
     }
@@ -82,7 +154,7 @@ export default function Mentorship() {
   const toggleFollow = async (groupId: string) => {
     try {
       await axios.post(
-        `${mainUrlPrefix}/mentorship/follow/${groupId}/${userId}`,
+        `${mainUrlPrefix}/mentorship/follow/${groupId}/${userId}`
       );
       fetchGroups();
     } catch (error) {
@@ -115,7 +187,6 @@ export default function Mentorship() {
     formData.append("title", postTitle);
     formData.append("description", postDescription);
     if (postImage) {
-      // Append file with field name "file" as expected by multer
       formData.append("file", postImage);
     }
 
@@ -123,7 +194,7 @@ export default function Mentorship() {
       await axios.post(
         `${mainUrlPrefix}/mentorship/${groupId}/addPost`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       setShowPostForm(false);
       setPostTitle("");
@@ -138,7 +209,7 @@ export default function Mentorship() {
   const handleEditPost = async (
     e: React.FormEvent,
     groupId: string,
-    postIndex: number,
+    postIndex: number
   ) => {
     try {
       e.preventDefault();
@@ -151,7 +222,7 @@ export default function Mentorship() {
       await axios.post(
         `${mainUrlPrefix}/mentorship/${groupId}/updatePost/${postIndex}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } },
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       setShowPostForm(false);
       setPostTitle("");
@@ -167,7 +238,7 @@ export default function Mentorship() {
   const handleDeletePost = async (postIndex: string, groupId: string) => {
     try {
       await axios.delete(
-        `${mainUrlPrefix}/mentorship/${groupId}/deletePost/${postIndex}`,
+        `${mainUrlPrefix}/mentorship/${groupId}/deletePost/${postIndex}`
       );
       fetchGroups();
     } catch (error) {
@@ -175,18 +246,11 @@ export default function Mentorship() {
     }
   };
 
-  // Handle file changes for post image upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setPostImage(e.target.files[0]);
     }
   };
-
-  useEffect(() => {
-    if (selectedGroup) {
-      console.log("Selected Group:", selectedGroup);
-    }
-  }, [selectedGroup]);
 
   return (
     <div className="mentor-body">
@@ -212,7 +276,16 @@ export default function Mentorship() {
           </button>
         )}
       </div>
-
+      <div>
+        {currentPage === "yours" && role === "alumini" && (
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="add-community"
+          >
+            Add Community
+          </button>
+        )}
+      </div>
       {/* Explore Section */}
       {currentPage === "explore" && (
         <div className="mentor-content-page">
@@ -228,7 +301,7 @@ export default function Mentorship() {
                   <h2>{group.groupTitle}</h2>
                   <p>{group.groupDescription}</p>
                   <p>
-                    <strong>Followers : </strong>
+                    <strong>Followers: </strong>
                     {group.followers.length}
                   </p>
                 </div>
@@ -277,7 +350,7 @@ export default function Mentorship() {
                   <h2>{group.groupTitle}</h2>
                   <p>{group.groupDescription}</p>
                   <p>
-                    <strong>Followers : </strong>
+                    <strong>Followers: </strong>
                     {group.followers.length}
                   </p>
                 </div>
@@ -314,14 +387,6 @@ export default function Mentorship() {
       {/* Yours Section */}
       {currentPage === "yours" && (
         <div className="mentor-content-page">
-          {role === "alumini" && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="add-community"
-            >
-              Add Community
-            </button>
-          )}
           {showAddForm && (
             <div
               className="dialog-overlay"
@@ -369,7 +434,7 @@ export default function Mentorship() {
                   <h2>{group.groupTitle}</h2>
                   <p>{group.groupDescription}</p>
                   <p>
-                    <strong>Followers : </strong>
+                    <strong>Followers: </strong>
                     {group.followers.length}
                   </p>
                 </div>
@@ -393,9 +458,22 @@ export default function Mentorship() {
               <div>
                 <h2>{selectedGroup.groupTitle}</h2>
                 <p>{selectedGroup.groupDescription}</p>
+                <div
+                  className="followers-clickable"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowFollowersDialog(true);
+                  }}
+                >
+                  Followers: {selectedGroup.followers.length}
+                </div>
               </div>
               {role === "alumini" && selectedGroup.userId === userId && (
-                <button onClick={() => setShowPostForm(true)} title="Add post">
+                <button
+                  onClick={() => setShowPostForm(true)}
+                  title="Add post"
+                  className="addPost"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="24px"
@@ -416,7 +494,7 @@ export default function Mentorship() {
                       src={`data:${
                         post.post.image.contentType
                       };base64,${arrayBufferToBase64(
-                        post.post.image.data.data,
+                        post.post.image.data.data
                       )}`}
                       alt="Post"
                     />
@@ -472,6 +550,14 @@ export default function Mentorship() {
             )}
           </dialog>
         </div>
+      )}
+
+      {/* Followers Dialog */}
+      {showFollowersDialog && selectedGroup && (
+        <FollowersDialog
+          groupId={selectedGroup._id}
+          onClose={() => setShowFollowersDialog(false)}
+        />
       )}
 
       {/* Add/Edit Post Modal */}

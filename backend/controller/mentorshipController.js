@@ -79,10 +79,10 @@ async function GetAllGroup(req, res) {
 async function GetGroupByUserId(req, res) {
   try {
     const { userId } = req.params;
-    const mentorshipGroups = await Mentorship.find({ userId });
+    const mentorshipGroups = await Mentorship.find({ userId: userId });
 
     if (mentorshipGroups.length === 0) {
-      return res.status(404).json({ message: "No mentorship groups found for this user" });
+      return res.status(200).json({ message: "No mentorship groups found for this user" });
     }
 
     res.json({ message: "Mentorship groups fetched successfully", mentorshipGroups });

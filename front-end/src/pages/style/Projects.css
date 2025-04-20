@@ -1,288 +1,283 @@
 .projects-container {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    border-radius: 1rem;
-    padding: 1rem;
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border-radius: 1rem;
+  padding: 1rem;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  position: relative;
 }
 
 .tabs {
-    width: fit-content;
-    height: fit-content;
-    padding: 4px;
-    border-radius: 100px;
-    background-color: #222;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: fit-content;
+  height: fit-content;
+  padding: 4px;
+  border-radius: 100px;
+  background-color: #222;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .tab {
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 100px;
-    transition: 0.2s all ease-in-out;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 100px;
+  transition: 0.2s all ease-in-out;
 }
 
 .tab.active {
-    background: #fff;
-    color: #222;
-    border-radius: 100px;
+  background: #fff;
+  color: #222;
+  border-radius: 100px;
 }
 .tab:active {
-    scale: 1.2;
+  scale: 1.2;
 }
 
 .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 1rem;
 }
 
 .project-card {
-    background: white;
-    height: fit-content;
-    border-radius: 10px;
-    padding: 1rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #9e9e9e;
-    position: relative;
+  background: white;
+  height: fit-content;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #9e9e9e;
+  position: relative;
 }
 .project-card img {
-    width: 100%;
+  width: 100%;
 }
 
 .project-card h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 .project-card p {
-    font-size: 14px;
-    color: #555;
+  font-size: 14px;
+  color: #555;
 }
 
 .know-more-btn {
-    height: 3rem;
-    width: 100%;
-    background: #222;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    margin-top: 1rem;
-    cursor: pointer;
-    text-align: center;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s all ease-in-out;
+  height: 3rem;
+  width: 100%;
+  background: #222;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s all ease-in-out;
 }
 .know-more-btn p {
-    color: #fff;
-    text-decoration: none;
+  color: #fff;
+  text-decoration: none;
 }
 
 .know-more-btn:active {
-    scale: 1.05;
+  scale: 1.05;
 }
 
 .add-project-btn {
-    position: absolute;
-    bottom: 2%;
-    right: 1.5%;
-    height: 3rem;
-    border-radius: 2rem;
-    background-color: rgba(161, 161, 161, 0.2);
-    color: rgb(0, 0, 0);
+  margin-top: 1rem;
+  height: 3rem;
+  border-radius: 2rem;
+  background-color: rgba(161, 161, 161, 0.2);
+  color: rgb(0, 0, 0);
 }
 .add-project-btn:hover {
-    background-color: #333;
-    color: #fff;
+  background-color: #333;
+  color: #fff;
 }
 .add-project-btn:active {
-    background-color: royalblue;
+  background-color: royalblue;
 }
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 400px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
 }
 
 .modal-content input,
 .modal-content textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .modal-buttons {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .submit-btn {
-    background: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  background: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .submit-btn:hover {
-    background: #0056b3;
+  background: #0056b3;
 }
 
 .cancel-btn {
-    background: #dc3545;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  background: #dc3545;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .cancel-btn:hover {
-    background: #c82333;
+  background: #c82333;
 }
 .fundRaiserTag {
-    background-color: rgb(232, 151, 0);
-    border-radius: 1rem;
-    height: fit-content;
-    display: grid;
-    place-items: center;
+  background-color: rgb(232, 151, 0);
+  border-radius: 1rem;
+  height: fit-content;
+  display: grid;
+  place-items: center;
 }
 .fundRaiserTag svg {
-    fill: rgb(255, 217, 147);
+  fill: rgb(255, 217, 147);
 }
 .referal-inputs {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .no-referrals-message {
-    width: 100%;
-    text-align: center;
-    padding: 2rem;
-    background-color: #f8f9fa;
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 1rem 0;
-    grid-column: 1 / -1;
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 1rem 0;
+  grid-column: 1 / -1;
 }
 
 .no-referrals-message p {
-    font-size: 1.1rem;
-    color: #666;
-    margin: 0;
-    font-weight: 500;
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
 }
 
 .referral-description {
-    margin-bottom: 1rem;
-    position: relative;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
 .referral-description p {
-    margin: 0;
-    line-height: 1.5;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .referral-description p.truncated {
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 6em; /* 4 lines * 1.5 line-height */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 6em; /* 4 lines * 1.5 line-height */
 }
 
 .referral-description p.expanded {
-    display: block;
+  display: block;
 }
 
 .read-more-btn {
-    background: none;
-    border: none;
-    color: #007bff;
-    padding: 0.25rem 0;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    font-weight: 500;
-    transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #007bff;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .read-more-btn:hover {
-    color: #0056b3;
-    text-decoration: underline;
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 .dialog-header {
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 .dialog-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
+  margin: 0;
+  font-size: 1.5rem;
 }
 
 .close-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
 
 .close-btn:hover {
-    color: #333;
-}
-
-.dialog-content {
+  color: #333;
 }
 
 .full-description p {
-    margin: auto;
-    width: 100%;
-    white-space: pre-wrap;
-    text-align: justify;
+  margin: auto;
+  width: 100%;
+  white-space: pre-wrap;
+  text-align: justify;
 }

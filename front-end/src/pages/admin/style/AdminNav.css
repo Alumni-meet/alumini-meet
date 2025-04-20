@@ -32,6 +32,16 @@
   cursor: default;
   user-select: none;
   transition: .5s all ease-in-out;
+  position: relative;
+}
+.roleTag {
+  font-size: 1rem;
+  padding: 5px 15px;
+  border-radius: 10rem;
+  position: absolute;
+  top: -20%;
+  right: -5%;
+  background-color: rgb(0, 132, 255);
 }
 .common-nav-logo:active{
   box-shadow: -1rem 1rem 0 #000;
@@ -70,7 +80,7 @@
   transition: .5s all ease;
 }
 .common-nav-list-items:active{
-  scale: 1.1;
+  scale: .8;
 }
 .common-profile-and-logout{
   display: flex;

@@ -19,7 +19,7 @@ export default function Referrals() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedReferral, setSelectedReferral] = useState<Refferal | null>(
-    null,
+    null
   );
   const [addReferralForm, setAddReferralForm] = useState(false);
   const [editingReferral, setEditingReferral] = useState<Refferal | null>(null);
@@ -59,7 +59,7 @@ export default function Referrals() {
         setReferrals(
           tab === "Explore"
             ? response.data.referral || []
-            : response.data.referrals || [],
+            : response.data.referrals || []
         );
       } else {
         // Only set error for actual errors, not for empty results
@@ -75,7 +75,7 @@ export default function Referrals() {
     } finally {
       setLoading(false);
     }
-  }, [userId, tab]);
+  }, [userId]);
 
   useEffect(() => {
     fetchReferrals();
@@ -83,7 +83,7 @@ export default function Referrals() {
 
   // Handle input changes for the add/edit form
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -104,7 +104,7 @@ export default function Referrals() {
       const response = await axios.post(
         `${mainUrlPrefix}/referral/addReferral/${userId}`,
         payload,
-        { headers: { "Content-Type": "application/json" } },
+        { headers: { "Content-Type": "application/json" } }
       );
       if (response.data.status === "Success") {
         setAddReferralForm(false);
@@ -120,7 +120,7 @@ export default function Referrals() {
   const handleDeleteReferral = async (referralId: string) => {
     try {
       await axios.delete(
-        `${mainUrlPrefix}/referral/deleteReferral/${referralId}`,
+        `${mainUrlPrefix}/referral/deleteReferral/${referralId}`
       );
       fetchReferrals();
     } catch (error) {
@@ -140,7 +140,7 @@ export default function Referrals() {
       const response = await axios.patch(
         `${mainUrlPrefix}/referral/editReferral/${referralId}`,
         payload,
-        { headers: { "Content-Type": "application/json" } },
+        { headers: { "Content-Type": "application/json" } }
       );
       if (response.data.status === "Success") {
         setEditingReferral(null);

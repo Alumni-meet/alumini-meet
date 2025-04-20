@@ -120,7 +120,16 @@ export default function Projects() {
             </button>
           )}
         </div>
-
+          <div>
+          {tab === "Yours" && role === "user" && (
+          <button
+            className="add-project-btn"
+            onClick={() => setAddProjectForm(true)}
+          >
+            Add Project
+          </button>
+        )}
+          </div>
         <div className="projects-grid">
           {(tab === "Explore"
             ? projects
@@ -176,17 +185,8 @@ export default function Projects() {
           ))}
         </div>
 
-        {role === "user" && (
-          <button
-            className="add-project-btn"
-            onClick={() => setAddProjectForm(true)}
-          >
-            Add Project
-          </button>
-        )}
-
         {addProjectForm && (
-          <div className="modal-overlay">
+          <div className="dialog-overlay">
             <div className="modal-content">
               <h2>Add New Project</h2>
               <form onSubmit={handleAddProject}>

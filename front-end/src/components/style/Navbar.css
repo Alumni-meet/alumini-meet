@@ -1,4 +1,4 @@
-.common-nav{
+.common-nav {
   height: 100%;
   width: 20rem;
   min-width: 16rem;
@@ -7,7 +7,7 @@
   justify-content: space-evenly;
   align-items: center;
 }
-.common-nav-list{
+.common-nav-list {
   gap: 4px;
   height: 60%;
   width: 90%;
@@ -15,26 +15,26 @@
   flex-direction: column;
   align-items: center;
 }
-.common-nav-list-items{
+.common-nav-list-items {
   width: 100%;
   border-radius: 8px;
   list-style: none;
   display: flex;
 }
-.common-nav-logo{
+.common-nav-logo {
   font-size: 2rem;
   font-weight: 900;
   color: #fff;
   background-color: #333;
   padding: 1rem;
   border-radius: 1rem;
-  text-decoration:underline dashed;
+  text-decoration: underline dashed;
   cursor: default;
   user-select: none;
   position: relative;
-  transition: .5s all ease-in-out;
+  transition: 0.5s all ease-in-out;
 }
-.roleTag{
+.roleTag {
   font-size: 1rem;
   padding: 5px 15px;
   border-radius: 10rem;
@@ -43,12 +43,13 @@
   right: -5%;
   background-color: rgb(0, 132, 255);
 }
-.common-nav-logo:active{
+.common-nav-logo:active {
   box-shadow: -1rem 1rem 0 #000;
-  transition: .2s all ease-in-out;
+  transition: 0.2s all ease-in-out;
   scale: 1.2;
 }
-.active, .common-nav-link{
+.active,
+.common-nav-link {
   color: #222222;
   border-radius: 8px;
   height: 2.5rem;
@@ -57,32 +58,32 @@
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  transition: .5s all ease;
+  transition: 0.5s all ease;
 }
-.active{
+.active {
   background-color: #ffffff;
 }
-.common-nav-link svg{
+.common-nav-link svg {
   fill: #222222;
 }
-.common-nav-link:hover{
+.common-nav-link:hover {
   background-color: #ffffff55;
 }
-.common-nav-list-items p{
+.common-nav-list-items p {
   flex: 2;
   color: #222;
 }
-.common-nav-list-items svg{
+.common-nav-list-items svg {
   flex: 1;
   fill: #222;
 }
-.common-nav-list-items{
-  transition: .5s all ease;
+.common-nav-list-items {
+  transition: 0.5s all ease;
 }
-.common-nav-list-items:active{
-  scale: 1.1;
+.common-nav-list-items:active {
+  scale: 0.8;
 }
-.common-profile-and-logout{
+.common-profile-and-logout {
   display: flex;
   width: 50%;
   height: 3.5em;
@@ -91,9 +92,9 @@
   background-color: #ffffff;
   border: 2px solid #ffffff;
   border-radius: 4rem;
-  overflow: hidden
+  overflow: hidden;
 }
-.common-logout{
+.common-logout {
   height: 100%;
   background-color: transparent;
   padding: 0;
@@ -102,35 +103,35 @@
   justify-content: center;
   align-items: center;
   border-radius: 0;
-  transition: .5s all ease;
+  transition: 0.5s all ease;
 }
-.common-logout svg{
+.common-logout svg {
   fill: #222;
 }
-.common-profile-link{
+.common-profile-link {
   height: 100%;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: .5s all ease;
+  transition: 0.5s all ease;
 }
 .common-profile-link svg {
   fill: #222;
 }
-.common-profile-link:hover{
+.common-profile-link:hover {
   background-color: rgba(65, 105, 225, 0.2);
 }
-.common-profile-link:hover svg{
+.common-profile-link:hover svg {
   fill: royalblue;
 }
-.common-logout:hover{
+.common-logout:hover {
   background-color: rgba(255, 0, 0, 0.2);
 }
-.common-logout:hover svg{
+.common-logout:hover svg {
   fill: red;
 }
-.common-nav-ruler{
+.common-nav-ruler {
   height: 100%;
   color: #ffffff;
 }

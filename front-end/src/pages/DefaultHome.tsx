@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { mainUrlPrefix } from "../main";
 import "./style/DefaultHome.css";
+import RandomHexColor from "random-hex-color";
+import { Link } from "react-router-dom";
 
 interface User {
   firstName: string;
@@ -47,13 +49,13 @@ export default function DefaultHome() {
       try {
         const userId = sessionStorage.getItem("user");
         const response = await axios.get(
-          `${mainUrlPrefix}/user/getUser/${userId}`,
+          `${mainUrlPrefix}/user/getUser/${userId}`
         );
         const updatedUser = response.data.userDetail;
         setUser(updatedUser);
       } catch (error) {
         setError(
-          error instanceof Error ? error.message : "Failed to load profile",
+          error instanceof Error ? error.message : "Failed to load profile"
         );
       }
     };
@@ -70,7 +72,7 @@ export default function DefaultHome() {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          `${mainUrlPrefix}/project/getAllProjects`,
+          `${mainUrlPrefix}/project/getAllProjects`
         );
         setProjects(response.data.projects || []);
       } catch (error) {
@@ -111,12 +113,19 @@ export default function DefaultHome() {
             <p>No upcoming events.</p>
           ) : (
             events.map((event) => (
-              <div key={event._id} className="home-event-card">
+              <div
+                key={event._id}
+                className="home-event-card"
+                style={{ backgroundColor: RandomHexColor() + "22" }}
+              >
                 <h3>{event.eventTitle}</h3>
                 <p>{event.eventDescription}</p>
               </div>
             ))
           )}
+          <div className="knowMoreOverlay">
+            <Link to="event"><button>Know More</button></Link>
+          </div>
         </div>
       </div>
 
@@ -128,12 +137,19 @@ export default function DefaultHome() {
             <p>No featured projects.</p>
           ) : (
             projects.map((project) => (
-              <div key={project._id} className="home-project-card">
+              <div
+                key={project._id}
+                className="home-project-card"
+                style={{ backgroundColor: RandomHexColor() + "22" }}
+              >
                 <h3>{project.projectTitle}</h3>
                 <p>{project.projectDescription}</p>
               </div>
             ))
           )}
+          <div className="knowMoreOverlay">
+            <Link to="projects"><button>Know More</button></Link>
+          </div>
         </div>
       </div>
     </div>

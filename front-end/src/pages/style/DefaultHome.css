@@ -33,6 +33,7 @@
   height: 25rem;
   overflow: hidden;
   background-color: #fff;
+  padding: 0;
 }
 
 .user-details {
@@ -108,70 +109,42 @@
   height: 20rem;
   width: 100%;
   position: relative;
+  gap: 5px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
 }
 .home-event-card,
 .home-project-card {
   border-radius: 0.5rem;
   height: 15rem;
-  width: 50%;
+  max-width: 30%;
   min-width: 20rem;
-  overflow: auto;
-  display: block;
   padding: 1rem;
+  overflow: hidden;
+  border: 1px solid #33333355;
+  backdrop-filter: blur(8px);
+}
+.knowMoreOverlay{
   position: absolute;
-  background-color: #fff;
-  border: 1px dashed #9e9e9e;
-}
-.home-event-card:nth-child(1) {
-  z-index: 10;
-  top: 0%;
-}
-.home-project-card:nth-child(1) {
-  z-index: 10;
-  top: 0%;
-}
-.home-event-card:nth-child(2) {
-  left: 45%;
-  top: 45%;
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-  z-index: 5;
-}
-.home-project-card:nth-child(2) {
-  left: 55%;
-  top: 45%;
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-  z-index: 5;
-}
-.home-event-card:nth-child(3) {
-  opacity: 0.1;
-  left: 40%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-}
-.home-project-card:nth-child(3) {
-  opacity: 0.1;
-  left: 60%;
-  top: 60%;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-}
-.view-more-btn,
-.project-view-more-btn {
-  position: absolute;
-  bottom: 2rem;
-  right: 1rem;
-  background-color: #9e9e9e;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
   border-radius: 1rem;
-  z-index: 30;
+  background-color: #33333322;
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  z-index: 10;
+  opacity: 0;
+  transition: .5s all ease;
 }
-.view-more-btn:hover {
-  background-color: #333;
+.event-card-container:hover .knowMoreOverlay,
+.project-card-container:hover .knowMoreOverlay{
+  visibility: visible;
+  opacity: 1;
 }
 @media screen and (max-width: 1080px) {
   .event-details,
