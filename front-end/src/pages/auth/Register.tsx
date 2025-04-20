@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./style/Register.css";
 import logo from "../../assets/logo.png";
 import { Link } from "react-router-dom";
@@ -30,7 +30,7 @@ export default function Register() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -108,7 +108,7 @@ export default function Register() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setVerificationError(
-          error.response?.data?.message || "Verification failed.",
+          error.response?.data?.message || "Verification failed."
         );
       } else {
         setVerificationError("An error occurred. Please try again.");
@@ -323,7 +323,9 @@ export default function Register() {
       </div>
 
       <div
-        className={`verification-dialog-overlay ${isVerificationDialogOpen ? "active" : ""}`}
+        className={`verification-dialog-overlay ${
+          isVerificationDialogOpen ? "active" : ""
+        }`}
       >
         <div className="verification-dialog">
           <h2>Email Verification</h2>

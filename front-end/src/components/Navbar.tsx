@@ -6,6 +6,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const role = sessionStorage.getItem("role");
+
   const handleLogout = () => {
     sessionStorage.removeItem("user");
     console.log("User logged out");
@@ -16,12 +18,21 @@ export default function Navbar() {
     return location.pathname === path;
   };
   useEffect(() => {
-    isActive("/home");
+    isActive("/home/");
   }, []);
 
   return (
     <nav className="common-nav">
-      <div className="common-nav-logo">Alumni meet</div>
+      <div className="common-nav-logo">
+        Alumni meet
+        <div className="roleTag">
+          {role === "user"
+            ? "Student"
+            : role === "alumini"
+            ? "Alumni"
+            : "Admin"}
+        </div>
+      </div>
       <ul className="common-nav-list">
         <li className="common-nav-list-items">
           <Link

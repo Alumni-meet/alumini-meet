@@ -6,12 +6,9 @@ import { useState } from "react";
 export default function Home() {
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  const toggleNav = () => {
-    setIsNavOpen(!isNavOpen);
-  };
   return (
     <div className="home-body">
-      <button className="hambtn" onClick={toggleNav}>
+      <button className="hambtn" onClick={() => setIsNavOpen(!isNavOpen)}>
         {!isNavOpen ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +31,7 @@ export default function Home() {
           </svg>
         )}
       </button>
-      <div className={`common-navbar ${!isNavOpen ? "hidden" : ""}`}>
+      <div className={`common-navbar ${!isNavOpen ? "hidden" : ""}`} onClick={() => setIsNavOpen(!isNavOpen)}>
         <Navbar />
       </div>
       <div className="outlet">

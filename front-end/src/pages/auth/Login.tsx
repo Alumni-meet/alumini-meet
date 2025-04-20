@@ -43,10 +43,10 @@ export default function Login() {
 
       switch (role) {
         case "user":
-          nav("/home");
+          nav("/home/");
           break;
         case "alumini":
-          nav("/home");
+          nav("/home/");
           break;
         case "admin":
           nav("/admin/user-management");
@@ -101,9 +101,9 @@ export default function Login() {
                 onChange={handleChange}
                 required
               />
-              <Link to="#" id="forgot-password">
+              {/* <Link to="#" id="forgot-password">
                 Forgot password
-              </Link>
+              </Link> */}
             </label>
             <input
               type="submit"

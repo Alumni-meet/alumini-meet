@@ -31,7 +31,17 @@
   text-decoration:underline dashed;
   cursor: default;
   user-select: none;
+  position: relative;
   transition: .5s all ease-in-out;
+}
+.roleTag{
+  font-size: 1rem;
+  padding: 5px 15px;
+  border-radius: 10rem;
+  position: absolute;
+  top: -20%;
+  right: -5%;
+  background-color: rgb(0, 132, 255);
 }
 .common-nav-logo:active{
   box-shadow: -1rem 1rem 0 #000;
