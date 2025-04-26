@@ -143,20 +143,23 @@ export default function TopCompanies() {
             />
             <h2>{company.name}</h2>
             <div className="company-description-container">
-              <p className="company-description">{company.description}</p>
-              {company.description && (
-                <button onClick={() => setSelectedCompanyId(company._id)}>
-                  Know More
-                </button>
-              )}
-              <br />
-              <a
-                href={company.website}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Visit Website
-              </a>
+                <p className="company-description">{company.description}</p>
+                <div className="top-company-actions">
+                {company.description && (
+                  <button onClick={() => setSelectedCompanyId(company._id)}>
+                    Know More
+                  </button>
+                )}
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="top-company-link"
+                >
+                  Visit Website
+                  <svg xmlns="http://www.w3.org/2000/svg" height="1rem" viewBox="0 -960 960 960" fill="#fff"><path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg>
+                </a>
+              </div>
             </div>
           </div>
         ))}

@@ -1,271 +1,286 @@
 .top-companies-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .companies-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
 .company-card {
-    background: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    cursor: pointer;
-    border: 1px solid #9e9e9e;
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  cursor: pointer;
+  border: 1px solid #9e9e9e;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
 }
 
 .company-logo {
-    width: 100%;
-    height: 120px;
-    object-fit: contain;
-    margin-bottom: 1rem;
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 1rem;
 }
 
 .company-description-container {
-    position: relative;
-    margin-bottom: 1rem;
-    flex-grow: 1;
+  position: relative;
+  margin-bottom: 1rem;
+  flex-grow: 1;
 }
 
 .company-card {
-    border: none;
+  border: none;
 }
 
 .comment-card {
-    width: 100%;
-    padding: 1rem;
-    box-shadow: none;
-    border-bottom: none;
+  width: 100%;
+  padding: 1rem;
+  box-shadow: none;
+  border-bottom: none;
 }
 
 .read-more-btn {
-    background: none;
-    border: none;
-    color: #2196f3;
-    cursor: pointer;
-    font-size: 0.85rem;
-    padding: 0;
-    margin: 0.5rem 0;
-    text-decoration: underline;
+  background: none;
+  border: none;
+  color: #2196f3;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  margin: 0.5rem 0;
+  text-decoration: underline;
 }
 
 .read-more-btn:hover {
-    color: #0b7dda;
+  color: #0b7dda;
 }
 
 /* Alumni Remarks Section */
 .alumni-section {
-    margin-top: auto;
+  margin-top: auto;
 }
 
 .add-comment-section {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #eee;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
 }
 
 .add-comment-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0.5rem 0;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
 }
 
 .add-comment-section li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-    font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
 }
 
 /* Form Modal */
 .form-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .form-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    max-width: 600px;
-    width: 100%;
-    position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
 }
 
 .form-content textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin: 1rem 0;
-    min-height: 100px;
-    resize: vertical;
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 1rem 0;
+  min-height: 100px;
+  resize: vertical;
 }
 
 .form-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .form-buttons button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .form-buttons button[type="submit"] {
-    background-color: #4caf50;
-    color: white;
+  background-color: #4caf50;
+  color: white;
 }
 
 /* Description Dialog */
 .description-dialog {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
 }
 
 .description-dialog-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    max-width: 800px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
 }
 
 .description-dialog-content h3 {
-    margin-bottom: 1.5rem;
-    color: #333;
-    font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.5rem;
 }
 
 .description-content {
-    line-height: 1.6;
-    color: #444;
-    white-space: pre-wrap;
+  line-height: 1.6;
+  color: #444;
+  white-space: pre-wrap;
 }
 
 .description-content p {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.5rem 1rem;
-    background: #f44336;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
 /* Loading State */
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-    font-size: 1.2rem;
-    color: #666;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  font-size: 1.2rem;
+  color: #666;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .companies-grid {
-        grid-template-columns: 1fr;
-    }
+  .companies-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .description-dialog-content {
-        padding: 1rem;
-        max-width: 95%;
-    }
+  .description-dialog-content {
+    padding: 1rem;
+    max-width: 95%;
+  }
 }
 
 /* Comment Cards Styling */
 .comments-grid {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 .comment-card {
-    background: #fff;
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+  background: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
 }
 
 .user-info {
-    font-weight: 600;
-    color: #495057;
+  font-weight: 600;
+  color: #495057;
 }
 
 .comment-actions {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .edit-btn,
 .delete-btn {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
 }
 
 .edit-btn {
-    background-color: #4dabf7;
-    color: white;
+  background-color: #4dabf7;
+  color: white;
 }
 
 .edit-btn:hover {
-    background-color: #339af0;
+  background-color: #339af0;
 }
 
 .delete-btn {
-    background-color: #fa5252;
-    color: white;
+  background-color: #fa5252;
+  color: white;
 }
 
 .delete-btn:hover {
-    background-color: #e03131;
+  background-color: #e03131;
+}
+.top-company-actions {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.top-company-link {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: #007bff;
+  text-decoration: none;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
 }

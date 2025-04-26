@@ -25,6 +25,10 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true, 
+    },
+    postedBy: {
+        type: String,
+        trim: true
     }
 });
 
