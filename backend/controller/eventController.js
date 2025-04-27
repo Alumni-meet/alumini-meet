@@ -11,12 +11,12 @@ const handleFileUpload = createFileUploadMiddleware([
 
 const addEvent = async (req, res) => {
   try {
-    const { eventTitle, eventDescription, applyLink } = req.body;
+    const { eventTitle, eventDescription, applyLink, postedBy } = req.body;
 
-    if (!eventTitle || !eventDescription || !applyLink) {
+    if (!eventTitle || !eventDescription || !applyLink || !postedBy || !postedBy.userId || !postedBy.userName) {
       return res.status(400).json({
         status: "failure",
-        message: "All fields (title, description, apply link) are required.",
+        message: "All fields (title, description, apply link, postedBy.userId, postedBy.userName) are required.",
       });
     }
 
@@ -29,6 +29,7 @@ const addEvent = async (req, res) => {
       eventTitle,
       eventDescription,
       applyLink,
+      postedBy,
     });
 
     res.status(201).json({
@@ -48,7 +49,7 @@ const addEvent = async (req, res) => {
 const editEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { eventTitle, eventDescription, applyLink } = req.body;
+    const { eventTitle, eventDescription, applyLink, postedBy } = req.body;
 
     if (!id) {
       return res.status(400).json({
@@ -57,14 +58,14 @@ const editEvent = async (req, res) => {
       });
     }
 
-    if (!eventTitle || !eventDescription || !applyLink) {
+    if (!eventTitle || !eventDescription || !applyLink || !postedBy || !postedBy.userId || !postedBy.userName) {
       return res.status(400).json({
         status: "failure",
-        message: "All fields (title, description, apply link) are required.",
+        message: "All fields (title, description, apply link, postedBy.userId, postedBy.userName) are required.",
       });
     }
 
-    const updatedEvent = { eventTitle, eventDescription, applyLink };
+    const updatedEvent = { eventTitle, eventDescription, applyLink, postedBy };
 
     // Handle image update
     const eventImg = processUploadedFile(req, "eventImg");

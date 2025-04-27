@@ -24,11 +24,12 @@ const addProject = async (req, res) => {
 
     const newProject = new Project({
       userId,
+      username,
       projectTitle,
       projectDescription,
       gitLink,
       upiQR
-    });
+    }); 
 
     await newProject.save();
     res.status(201).json({
@@ -97,9 +98,9 @@ const getUserProject = async (req, res) => {
 
 const deleteProject = async (req, res) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
+    await Project.findByIdAndDelete(req.params.projectId);
     res.status(200).json({
-      status: "Success",
+      status: "success",
       message: "project deleted successfully.",
     });
   } catch (error) {
@@ -112,14 +113,14 @@ const deleteProject = async (req, res) => {
 
 const editProject = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { projectId } = req.params;
     const updatedProject = {
       projectTitle: req.body.projectTitle,
       projectDescription: req.body.projectDescription,
       gitLink: req.body.gitLink,
       upiQR: req.body.upiQR 
     };
-    const result = await Project.findByIdAndUpdate(id, updatedProject, {
+    const result = await Project.findByIdAndUpdate(projectId, updatedProject, {
       new: true,
     });
     if (!result) {

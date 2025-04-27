@@ -298,7 +298,6 @@ const getUserById = async (req, res) => {
     const { userId } = req.params;
     const _id = userId;
     const userDetails = await User.findById(_id);
-    const user = await User.findById(req.params.id);
     if (!userDetails) {
       return res.status(404).json({
         status: "failure",

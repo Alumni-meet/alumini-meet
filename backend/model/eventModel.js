@@ -11,6 +11,11 @@ const EventSchema = new mongoose.Schema({
             required: true
         }
     },
+    postedBy: {
+        userId:String,
+        userName: String,
+        trim: true,
+    },
     eventTitle: {
         type: String,
         required: true,

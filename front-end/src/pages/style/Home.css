@@ -34,7 +34,7 @@
     justify-content: center;
     position: absolute;
     top: 0.5rem;
-    left: 0.5rem;
+    right: 0.2rem;
     box-shadow: 0 0 1rem #9e9e9e;
     background-color: #fff;
     border-radius: 1rem;
@@ -43,7 +43,7 @@
     transition: .2s all ease-in-out;
   }
   .hambtn:active{
-    scale: 0.5;
+    scale: .5;
   }
   .common-navbar {
     z-index: 90;

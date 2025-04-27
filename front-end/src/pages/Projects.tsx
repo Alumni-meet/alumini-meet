@@ -3,14 +3,27 @@ import { useCallback, useEffect, useState } from "react";
 import "./style/Projects.css";
 import { mainUrlPrefix } from "../main";
 
+interface Project {
+  _id: string;
+  userId: string;
+  projectTitle: string;
+  projectDescription: string;
+  gitLink: string;
+  upiQR?: {
+    data: string;
+    contentType: string;
+  };
+}
+
 export default function Projects() {
-  const [tab, setTab] = useState("Explore");
+  const [tab, setTab] = useState<"Explore" | "Yours">("Explore");
   const userId = sessionStorage.getItem("user")?.trim();
   const role = sessionStorage.getItem("role")?.trim();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [fundRaiser, setFundRaiser] = useState(false);
   const [addProjectForm, setAddProjectForm] = useState(false);
-  const [formData, setFormData] = useState<any>({
+  const [editProjectForm, setEditProjectForm] = useState<Project | null>(null);
+  const [formData, setFormData] = useState({
     projectTitle: "",
     projectDescription: "",
     gitLink: "",
@@ -24,8 +37,7 @@ export default function Projects() {
         role === "user"
           ? `${mainUrlPrefix}/project/getUserProject/${userId}`
           : `${mainUrlPrefix}/project/getAllProjects`;
-
-      const response = await axios.get(endpoint);
+      const response = await axios.get<{ projects: Project[] }>(endpoint);
       setProjects(response.data.projects || []);
       console.log(response.data.projects);
     } catch (error) {
@@ -41,38 +53,31 @@ export default function Projects() {
   }, [userId, role, fetchProjects]);
 
   // Handle input changes
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev: any) => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
   // Handle file uploads
-  const handleFileChange = (fieldName: any) => (e: any) => {
-    const file = e.target.files[0];
-    setFormData((prev: any) => ({
+  const handleFileChange = (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFormData((prev) => ({
       ...prev,
       [fieldName]: file,
     }));
   };
 
   // Add a new project
-  const handleAddProject = async (e: any) => {
+  const handleAddProject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("projectTitle", formData.projectTitle);
       formDataToSend.append("projectDescription", formData.projectDescription);
       formDataToSend.append("gitLink", formData.gitLink);
-
-      // Append project image if exists
-      if (formData.projectImage) {
-        formDataToSend.append("projectImage", formData.projectImage);
-      }
-
-      // Append UPI QR if exists
       if (formData.upiQR) {
         formDataToSend.append("upiQR", formData.upiQR);
       }
@@ -85,7 +90,7 @@ export default function Projects() {
         "FormData to send:",
         Object.fromEntries(formDataToSend.entries())
       );
-      if (response.data.status === "Success") {
+      if (response.data.status === "success") {
         setAddProjectForm(false);
         setFormData({
           projectTitle: "",
@@ -94,10 +99,63 @@ export default function Projects() {
           upiQR: null,
         });
         fetchProjects();
-        setAddProjectForm(false);
       }
     } catch (error) {
       console.error("Failed to add project:", error);
+    }
+  };
+
+  // Edit a project
+  const handleEditProject = (project: Project) => {
+    setEditProjectForm(project);
+    setFormData({
+      projectTitle: project.projectTitle,
+      projectDescription: project.projectDescription,
+      gitLink: project.gitLink,
+      upiQR: project.upiQR,
+    });
+  };
+
+  // Update a project
+  const handleUpdateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("projectTitle", formData.projectTitle);
+      formDataToSend.append("projectDescription", formData.projectDescription);
+      formDataToSend.append("gitLink", formData.gitLink);
+      if (formData.upiQR) {
+        formDataToSend.append("upiQR", formData.upiQR);
+      }
+      const response = await axios.patch(
+        `${mainUrlPrefix}/project/editProject/${editProjectForm?._id}`,
+        formDataToSend,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      if (response.data.status === "success") {
+        setEditProjectForm(null);
+        setFormData({
+          projectTitle: "",
+          projectDescription: "",
+          gitLink: "",
+          upiQR: null,
+        });
+        fetchProjects();
+      }
+    } catch (error) {
+      console.error("Failed to update project:", error);
+    }
+  };
+
+  // Delete a project
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      const response = await axios.delete(`${mainUrlPrefix}/project/deleteProject/${projectId}`);
+      if (response.data.status === "success") {
+        fetchProjects();
+      }
+    } catch (error) {
+      console.error("Failed to delete project:", error);
     }
   };
 
@@ -120,21 +178,21 @@ export default function Projects() {
             </button>
           )}
         </div>
-          <div>
+        <div>
           {tab === "Yours" && role === "user" && (
-          <button
-            className="add-project-btn"
-            onClick={() => setAddProjectForm(true)}
-          >
-            Add Project
-          </button>
-        )}
-          </div>
+            <button
+              className="add-project-btn"
+              onClick={() => setAddProjectForm(true)}
+            >
+              Add Project
+            </button>
+          )}
+        </div>
         <div className="projects-grid">
           {(tab === "Explore"
             ? projects
-            : projects.filter((project: any) => project.userId === userId)
-          ).map((project: any) => (
+            : projects.filter((project) => project.userId === userId)
+          ).map((project) => (
             <div key={project._id} className="project-card">
               {project.upiQR && (
                 <div
@@ -181,10 +239,41 @@ export default function Projects() {
                 </svg>
                 <p>View on GitHub</p>
               </a>
+              {role === "user" && project.userId === userId && (
+                <div className="post-actions">
+                  <button
+                    type="button"
+                    onClick={() => handleEditProject(project)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#e3e3e3"
+                    >
+                      <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProject(project._id)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height="24px"
+                      viewBox="0 -960 960 960"
+                      width="24px"
+                      fill="#e3e3e3"
+                    >
+                      <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
-
         {addProjectForm && (
           <div className="dialog-overlay">
             <div className="modal-content">
@@ -214,7 +303,6 @@ export default function Projects() {
                   onChange={handleInputChange}
                   required
                 />
-
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
@@ -223,7 +311,6 @@ export default function Projects() {
                   />
                   Include Fundraiser
                 </label>
-
                 {fundRaiser && (
                   <div className="file-input">
                     <label>UPI QR Code:</label>
@@ -234,7 +321,6 @@ export default function Projects() {
                     />
                   </div>
                 )}
-
                 <div className="modal-buttons">
                   <button type="submit" className="submit-btn">
                     Add Project
@@ -243,6 +329,69 @@ export default function Projects() {
                     type="button"
                     className="cancel-btn"
                     onClick={() => setAddProjectForm(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        {editProjectForm && (
+          <div className="dialog-overlay">
+            <div className="modal-content">
+              <h2>Edit Project</h2>
+              <form onSubmit={handleUpdateProject}>
+                <input
+                  type="text"
+                  name="projectTitle"
+                  placeholder="Project Title"
+                  value={formData.projectTitle}
+                  onChange={handleInputChange}
+                  required
+                />
+                <textarea
+                  name="projectDescription"
+                  placeholder="Project Description"
+                  value={formData.projectDescription}
+                  onChange={handleInputChange}
+                  required
+                  rows={4}
+                />
+                <input
+                  type="url"
+                  name="gitLink"
+                  placeholder="GitHub Link"
+                  value={formData.gitLink}
+                  onChange={handleInputChange}
+                  required
+                />
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={fundRaiser}
+                    onChange={(e) => setFundRaiser(e.target.checked)}
+                  />
+                  Include Fundraiser
+                </label>
+                {fundRaiser && (
+                  <div className="file-input">
+                    <label>UPI QR Code:</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange("upiQR")}
+                    />
+                  </div>
+                )}
+                <div className="modal-buttons">
+                  <button type="submit" className="submit-btn">
+                    Update Project
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => setEditProjectForm(null)}
                   >
                     Cancel
                   </button>

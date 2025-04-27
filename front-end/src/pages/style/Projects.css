@@ -40,15 +40,18 @@
 }
 
 .projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
   gap: 20px;
   padding: 1rem;
+  justify-content: center;
 }
 
 .project-card {
   background: white;
-  height: fit-content;
+  max-height: 400px;
+  width: 300px;
   border-radius: 10px;
   padding: 1rem;
   text-align: center;
@@ -60,7 +63,8 @@
   position: relative;
 }
 .project-card img {
-  width: 100%;
+  height: 150px;
+  object-fit: contain;
 }
 
 .project-card h3 {
@@ -69,6 +73,7 @@
 }
 
 .project-card p {
+  overflow: auto;
   font-size: 14px;
   color: #555;
 }

@@ -106,7 +106,6 @@ const UserManagement = () => {
               <tr className="table-header">
                 <th>Name</th>
                 <th>Email</th>
-                <th>Role</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -115,7 +114,6 @@ const UserManagement = () => {
                 <tr key={user._id} className="table-row">
                   <td>{user.firstName} {user.lastName}</td>
                   <td>{user.email}</td>
-                  <td>{user.role}</td>
                   <td className="actions">
                     <button
                       onClick={() => handleEdit(user)}
