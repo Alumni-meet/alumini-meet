@@ -34,7 +34,7 @@ export default function Projects() {
   const fetchProjects = useCallback(async () => {
     try {
       const endpoint =
-        role === "user"
+        tab != "Explore"
           ? `${mainUrlPrefix}/project/getUserProject/${userId}`
           : `${mainUrlPrefix}/project/getAllProjects`;
       const response = await axios.get<{ projects: Project[] }>(endpoint);
@@ -44,7 +44,7 @@ export default function Projects() {
       console.error("Failed to fetch projects:", error);
       setProjects([]);
     }
-  }, [userId, role]);
+  }, [userId, tab]);
 
   useEffect(() => {
     if ((role === "user" && userId) || role !== "user") {
@@ -112,7 +112,7 @@ export default function Projects() {
       projectTitle: project.projectTitle,
       projectDescription: project.projectDescription,
       gitLink: project.gitLink,
-      upiQR: project.upiQR,
+      upiQR: project.upiQR as any,
     });
   };
 
