@@ -24,7 +24,7 @@ router.get("/followed/:userId", GetFollowedGroups);
 router.delete("/delete/:id", DeleteGroup);
 
 /** ---------------------- FOLLOW ROUTE ---------------------- */
-router.post("/follow/:groupId/:userId", ToggleFollow);
+router.post("/follow/:groupId/:userName", ToggleFollow);
 
 /** ---------------------- POSTS ROUTES ---------------------- */
 router.post("/:groupId/addPost", upload.single("file"), AddPost);

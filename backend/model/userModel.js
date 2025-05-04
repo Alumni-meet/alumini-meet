@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  userName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   firstName: {
     type: String,
     required: [true, "The first name is required."],
@@ -24,11 +29,11 @@ const userSchema = new mongoose.Schema({
   },
   dept: {
     type: String,
-    default: ""
+    default: "",
   },
   gender: {
     type: String,
-    enum: ["male","female","others"],
+    enum: ["male", "female", "others"],
     required: [true, "The gender is a required."],
   },
   phoneNumber: {
@@ -70,18 +75,17 @@ const userSchema = new mongoose.Schema({
   },
   batch: {
     type: Number,
-    default: ""
+    default: "",
   },
   role: {
     type: String,
-    enum: ["admin", "user", "alumini"]
+    enum: ["admin", "user", "alumini"],
   },
   userImg: {
     data: Buffer,
-    contentType: String
-  }
+    contentType: String,
+  },
 });
-
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

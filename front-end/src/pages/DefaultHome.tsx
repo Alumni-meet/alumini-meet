@@ -51,7 +51,7 @@ export default function DefaultHome() {
         const response = await axios.get(
           `${mainUrlPrefix}/user/getUser/${userId}`
         );
-        const updatedUser = response.data.userDetail;
+        const updatedUser = response.data;
         setUser(updatedUser);
       } catch (error) {
         setError(

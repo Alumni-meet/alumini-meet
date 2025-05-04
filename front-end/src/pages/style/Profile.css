@@ -17,7 +17,6 @@
   max-width: 45rem;
   min-width: 20rem;
   background: #fff;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
@@ -25,6 +24,8 @@
 }
 
 .profile-img {
+  width: 200px;
+  height: 200px;
   object-fit: contain;
   margin: 1rem auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -34,17 +35,15 @@
 
 /* Add a container for the image to ensure square aspect ratio */
 .profile-img-container {
-  width: 200px;
-  height: 200px;
   margin: 0 auto 1rem auto;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #f0f0f0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   background-color: #f5f5f5; /* Light background for image placeholder */
 }
 
 .edit-btn {
+  flex: 1;
   background: #007bff;
   border: none;
   color: white;

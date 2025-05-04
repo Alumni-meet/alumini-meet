@@ -4,6 +4,7 @@ import "./style/Profile.css";
 import { mainUrlPrefix } from "../main";
 
 interface User {
+  userName: string,
   _id: string;
   firstName: string;
   lastName: string;
@@ -48,7 +49,7 @@ export default function Profile() {
         if (!userId) throw new Error("User not authenticated");
 
         const response = await axios.get(
-          `${mainUrlPrefix}/user/getUser/${userId}`,
+          `${mainUrlPrefix}/user/getUser/${userId}`
         );
         console.log("Raw API Response:", response.data);
 
@@ -60,7 +61,7 @@ export default function Profile() {
       } catch (error) {
         console.error("Error fetching profile:", error);
         setError(
-          error instanceof Error ? error.message : "Failed to load profile",
+          error instanceof Error ? error.message : "Failed to load profile"
         );
         setLoading(false);
       }
@@ -68,12 +69,25 @@ export default function Profile() {
 
     fetchUserProfile();
   }, [userId]);
-
   const getImageUrl = (userData: User | null) => {
     if (!userData) return "";
+    
+    // If userImg is undefined, return default image
+    if (!userData.userImg) {
+      return "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+    }
 
-    // If userImg is a string (URL or data URL), return it directly
+    // If userImg is already a string (URL or data URL), return it directly
     if (typeof userData.userImg === "string") {
+      // Check if it's already a data URL
+      if (userData.userImg.startsWith("data:")) {
+        return userData.userImg;
+      }
+      // Check if it's a base64 string without the data URL prefix
+      if (/^[A-Za-z0-9+/=]+$/.test(userData.userImg)) {
+        return `data:image/jpeg;base64,${userData.userImg}`;
+      }
+      // Otherwise, assume it's a regular URL
       return userData.userImg;
     }
 
@@ -84,8 +98,8 @@ export default function Profile() {
         const base64String = btoa(
           uint8Array.reduce(
             (data, byte) => data + String.fromCharCode(byte),
-            "",
-          ),
+            ""
+          )
         );
         return `data:${userData.userImg.contentType};base64,${base64String}`;
       } catch (error) {
@@ -101,6 +115,7 @@ export default function Profile() {
   const openEditDialog = () => {
     if (user) {
       setFormData({
+        userName: user.userName,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
@@ -122,7 +137,7 @@ export default function Profile() {
 
   // Handle input change
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -168,38 +183,46 @@ export default function Profile() {
     e.preventDefault();
     try {
       if (!user) throw new Error("User not found");
-      const id = user._id || sessionStorage.getItem("user")!;
-
       const data = new FormData();
+      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
-        if (value) data.append(key, value as string);
+        if (value !== undefined && value !== null) {
+          data.append(key, value.toString());
+        }
       });
-
-      // Send skills and interests as arrays
+  
+      // Append skills and interests as JSON strings
       data.append("skills", JSON.stringify(skills));
       data.append("interests", JSON.stringify(interests));
-
-      if (selectedFile) data.append("userImg", selectedFile);
-
-      // Update request
-      await axios.post(`${mainUrlPrefix}/user/updateProfile/${id}`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
+  
+      // Append file if selected
+      if (selectedFile) {
+        data.append("userImg", selectedFile);
+      }
+  
+      // Use PUT instead of POST to match your backend route
+      await axios.put(`${mainUrlPrefix}/user/updateProfile/${userId}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      // Refetch user data to ensure we have the latest version
+  
+      // Refetch user data to update the UI
       const fetchResponse = await axios.get(
-        `${mainUrlPrefix}/user/getUser/${id}`,
+        `${mainUrlPrefix}/user/getUser/${userId}`
       );
-      const updatedUser = fetchResponse.data.userDetail;
-
-      // No need to process the image here as we'll use getImageUrl function
-      console.log("Updated user data:", updatedUser);
+      const updatedUser = fetchResponse.data;
+  
       setUser(updatedUser);
       setIsEditDialogOpen(false);
       setError("");
     } catch (error) {
       console.error("Error updating profile:", error);
-      setError("Error updating profile");
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.message || "Error updating profile");
+      } else {
+        setError("Error updating profile");
+      }
     }
   };
 
@@ -222,9 +245,9 @@ export default function Profile() {
               "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
           }}
         />
-
         {/* Profile Details */}
         <h1 className="profile-name">{`${user.firstName} ${user.lastName}`}</h1>
+        <h3><b>User Name  : </b>{user.userName}</h3>
         <p className="email-id">{user.email}</p>
         <p className="education">
           <b>Education:</b> {user.dept}, {user.batch}
@@ -238,7 +261,7 @@ export default function Profile() {
           <h3>Skills</h3>
           <div className="skills">
             {user.skills?.map((skill, index) => (
-              <div className="skill" key={index}>
+              <div className="chip" key={index}>
                 {skill}
               </div>
             ))}
@@ -270,7 +293,7 @@ export default function Profile() {
         {/* Interests */}
         <div className="interests-section">
           <h3>Interests</h3>
-          <div className="interests">
+          <div className="chip">
             {user.interests?.map((interest, index) => (
               <div className="interest" key={index}>
                 {interest}
@@ -498,17 +521,19 @@ export default function Profile() {
               </div>
 
               {/* Submit Buttons */}
-              <button type="submit">Save Changes</button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditDialogOpen(false);
-                  setFormData({});
-                  setSelectedFile(null);
-                }}
-              >
-                Cancel
-              </button>
+              <div className="form-actions">
+                <button type="submit">Save Changes</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditDialogOpen(false);
+                    setFormData({});
+                    setSelectedFile(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>

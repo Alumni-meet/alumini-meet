@@ -226,7 +226,7 @@ async function GetFollowedGroups(req, res) {
 
 async function ToggleFollow(req, res) {
   try {
-    const { groupId, userId } = req.params;
+    const { groupId, userName } = req.params;
 
     const mentorship = await Mentorship.findById(groupId);
     if (!mentorship) {
@@ -241,7 +241,7 @@ async function ToggleFollow(req, res) {
       mentorship.followers = mentorship.followers.filter((id) => id !== userId);
     } else {
       // Follow: Add user to followers
-      mentorship.followers.push(userId);
+      mentorship.followers.push(userName);
     }
 
     await mentorship.save();

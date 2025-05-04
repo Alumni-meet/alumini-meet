@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-// In-memory store for OTPs (use Redis in production)
+// In-memory store for OTPs
 const otpStore = new Map();
 
 // Configure Nodemailer transporter
@@ -109,7 +109,6 @@ const verifyOTP = async (req, res) => {
       role: userData.role,
       batch: userData.batch,
       dept: userData.dept,
-      // Optional userImg field
       userImg: req.file
         ? { data: req.file.buffer, contentType: req.file.mimetype }
         : undefined,
@@ -118,6 +117,7 @@ const verifyOTP = async (req, res) => {
     otpStore.delete(email);
 
     const userDetail = {
+      userName: req.body.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -179,6 +179,7 @@ const validateUser = async (req, res) => {
     }
 
     const userDetail = {
+      userName: req.body.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -209,111 +210,43 @@ const validateUser = async (req, res) => {
   }
 };
 
-// Update user profile (with optional image upload)
 const updateProfile = async (req, res) => {
   try {
-    const { userId } = req.params;
-    // Prepare update object from request body
-    const updatedProfile = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: req.body.password,
-      dept: req.body.dept,
-      batch: req.body.batch,
-      gender: req.body.gender,
-      phoneNumber: req.body.phoneNumber,
-      bio: req.body.bio,
-      linkedIn: req.body.linkedIn,
-      github: req.body.github,
-      twitter: req.body.twitter,
-      companyName: req.body.companyName,
-    };
+    const updateData = { ...req.body };
 
-    // Parse skills and interests from JSON strings
-    if (req.body.skills) {
-      try {
-        updatedProfile.skills = JSON.parse(req.body.skills);
-      } catch (error) {
-        console.error("Error parsing skills:", error);
-        updatedProfile.skills = [];
-      }
-    }
-
-    if (req.body.interests) {
-      try {
-        updatedProfile.interests = JSON.parse(req.body.interests);
-      } catch (error) {
-        console.error("Error parsing interests:", error);
-        updatedProfile.interests = [];
-      }
-    }
-
-    // If an image is uploaded, add userImg field
     if (req.file) {
-      updatedProfile.userImg = {
+      updateData.userImg = {
         data: req.file.buffer,
-        contentType: req.file.mimetype,
+        contentType: req.file.mimetype
       };
     }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        status: "failure",
-        message: "User not found.",
-      });
-    }
-
-    // Check if email is being updated and if it already exists
-    const email = req.body.email;
-    if (email && email !== user.email) {
-      const emailExists = await User.findOne({
-        email: req.body.email,
-        _id: { $ne: req.params.id },
-      });
-      if (emailExists) {
-        return res.status(400).json({
-          status: "failure",
-          message: "Email ID already present.",
-        });
-      }
-    }
-
-    await User.findByIdAndUpdate(userId, updatedProfile, { new: true });
-    res.status(200).json({
-      status: "Success",
-      message: "Profile updated successfully.",
-    });
+    
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      updateData,
+      { new: true }
+    );
+    
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({
-      status: "failure",
-      message: `Profile cannot be updated: ${error.message}`,
-    });
+    res.status(500).json({ error: error.message });
   }
 };
 
 const getUserById = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const _id = userId;
-    const userDetails = await User.findById(_id);
-    if (!userDetails) {
-      return res.status(404).json({
-        status: "failure",
-        message: "User not found.",
-      });
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    
+    const userObj = user.toObject();
+    
+    if (userObj.userImg?.data) {
+      userObj.userImg.data = userObj.userImg.data.toString('base64');
     }
-    res.status(200).json({
-      status: "Success",
-      message: "User fetched successfully.",
-      userDetail: userDetails,
-    });
-  } catch (e) {
-    res.status(500).json({
-      status: "failure",
-      message: `Cannot get user: ${e.message}`,
-    });
+    
+    res.status(200).json(userObj);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 

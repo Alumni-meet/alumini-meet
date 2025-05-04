@@ -1,4 +1,10 @@
-import { useEffect, useState, ChangeEvent, KeyboardEvent } from "react";
+import {
+  useEffect,
+  useState,
+  ChangeEvent,
+  KeyboardEvent,
+  FormEvent,
+} from "react";
 import axios from "axios";
 import "./style/Profile.css";
 import { mainUrlPrefix } from "../main";
@@ -21,105 +27,66 @@ interface User {
   batch: number;
   role: string;
   userImg?:
-    | string
     | {
-        data: number[];
+        data: string; // base64 string
         contentType: string;
-      };
+      }
+    | string; // or direct URL string
 }
+
+const DEFAULT_AVATAR =
+  "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<User>>({});
   const [interests, setInterests] = useState<string[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [newInterest, setNewInterest] = useState<string>("");
-  const [newSkill, setNewSkill] = useState<string>("");
+  const [newInterest, setNewInterest] = useState("");
+  const [newSkill, setNewSkill] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
   const userId = sessionStorage.getItem("user");
 
-  // Fetch user profile data on mount
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         if (!userId) throw new Error("User not authenticated");
+        setLoading(true);
         const response = await axios.get(
-          `${mainUrlPrefix}/user/getUser/${userId}`,
+          `${mainUrlPrefix}/user/getUser/${userId}`
         );
-        console.log("Raw API Response:", response.data);
-        const updatedUser = response.data.userDetail;
-
-        // Process user image
-        if (
-          updatedUser.userImg &&
-          typeof updatedUser.userImg === "object" &&
-          Array.isArray(updatedUser.userImg.data)
-        ) {
-          console.log("Raw Buffer Data:", updatedUser.userImg.data);
-          console.log("Content Type:", updatedUser.userImg.contentType);
-
-          // Convert buffer data to base64 string
-          const uint8Array = new Uint8Array(updatedUser.userImg.data);
-          const binaryString = Array.from(uint8Array)
-            .map((byte) => String.fromCharCode(byte))
-            .join("");
-          const base64String = btoa(binaryString);
-
-          // Create a data URL for the image
-          updatedUser.userImg = `data:${updatedUser.userImg.contentType};base64,${base64String}`;
-          console.log("Generated Image URL:", updatedUser.userImg); // Debug: Log the generated image URL
-        } else {
-          console.log("No image data found in user profile");
-          // Set a default image if none is provided
-          updatedUser.userImg = "https://via.placeholder.com/150";
-        }
-
-        setUser(updatedUser);
+        // Handle both response structures
+        const userData = response.data.userDetail || response.data;
+        if (!userData) throw new Error("No user data received");
+        setUser(userData);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        setError(
-          error instanceof Error ? error.message : "Failed to load profile",
-        );
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setError(err instanceof Error ? err.message : "Failed to load profile");
         setLoading(false);
       }
     };
-
     fetchUserProfile();
   }, [userId]);
 
-  // Function to handle image display
-  const getImageUrl = (userData: User | null) => {
-    if (!userData) return "";
+  const getImageUrl = (userData: User | null): string => {
+    if (!userData?.userImg) return DEFAULT_AVATAR;
+    // If userImg is already a URL string
     if (typeof userData.userImg === "string") {
-      // If userImg is already a string (URL or data URL), return it
-      return userData.userImg;
-    } else if (
-      userData.userImg &&
-      Array.isArray(userData.userImg.data) &&
-      userData.userImg.contentType
-    ) {
-      try {
-        const uint8Array = new Uint8Array(userData.userImg.data);
-        const binaryString = Array.from(uint8Array)
-          .map((byte) => String.fromCharCode(byte))
-          .join("");
-        const base64String = btoa(binaryString);
-        return `data:${userData.userImg.contentType};base64,${base64String}`;
-      } catch (error) {
-        console.error("Error processing image data:", error);
-        return "";
-      }
+      return userData.userImg.startsWith("http")
+        ? userData.userImg
+        : DEFAULT_AVATAR;
     }
-    // Default image if no valid image data
-    return "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+    // If userImg is an object with data and contentType
+    if (userData.userImg.data && userData.userImg.contentType) {
+      return `data:${userData.userImg.contentType};base64,${userData.userImg.data}`;
+    }
+    return DEFAULT_AVATAR;
   };
 
-  // Open edit dialog
   const openEditDialog = () => {
     if (user) {
       setFormData({
@@ -134,30 +101,23 @@ export default function Profile() {
         companyName: user.companyName,
         batch: user.batch,
       });
-
-      // Deduplicate and initialize chips
-      setInterests([...new Set(user.interests)]);
-      setSkills([...new Set(user.skills)]);
+      setInterests([...new Set(user.interests || [])]);
+      setSkills([...new Set(user.skills || [])]);
       setIsEditDialogOpen(true);
     }
   };
 
-  // Handle input change
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle file change
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
-    }
+    setSelectedFile(e.target.files?.[0] || null);
   };
 
-  // Handle adding interest
   const handleAddInterest = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newInterest.trim()) {
       e.preventDefault();
@@ -166,7 +126,6 @@ export default function Profile() {
     }
   };
 
-  // Handle adding skill
   const handleAddSkill = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && newSkill.trim()) {
       e.preventDefault();
@@ -175,57 +134,48 @@ export default function Profile() {
     }
   };
 
-  // Remove interest
   const removeInterest = (index: number) => {
     setInterests((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Remove skill
   const removeSkill = (index: number) => {
     setSkills((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle profile edit submission
-  const handleEdit = async (e: React.FormEvent) => {
+  const handleEdit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!user || !userId) return;
     try {
-      if (!user) throw new Error("User not found");
-      const id = user._id || sessionStorage.getItem("user")!;
-
       const data = new FormData();
+      // Append all form data
       Object.entries(formData).forEach(([key, value]) => {
-        if (value) data.append(key, value as string);
+        if (value !== undefined && value !== null) {
+          data.append(key, value.toString());
+        }
       });
-
-      // Send skills and interests as arrays
+      // Append arrays
       data.append("skills", JSON.stringify(skills));
       data.append("interests", JSON.stringify(interests));
-
-      if (selectedFile) data.append("userImg", selectedFile);
-
-      // Update request
-      await axios.post(`${mainUrlPrefix}/user/updateProfile/${id}`, data, {
+      // Append file if selected
+      if (selectedFile) {
+        data.append("userImg", selectedFile);
+      }
+      await axios.put(`${mainUrlPrefix}/user/updateProfile/${userId}`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      // Refetch user data to ensure we have the latest version
-      const fetchResponse = await axios.get(
-        `${mainUrlPrefix}/user/getUser/${id}`,
+      // Refetch updated data
+      const response = await axios.get(
+        `${mainUrlPrefix}/user/getUser/${userId}`
       );
-      const updatedUser = fetchResponse.data.userDetail;
-
-      // No need to process the image here as we'll use getImageUrl function
-      console.log("Updated user data:", updatedUser);
-      setUser(updatedUser);
+      setUser(response.data.userDetail || response.data);
       setIsEditDialogOpen(false);
       setError("");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setError("Error updating profile");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setError("Failed to update profile");
     }
   };
 
-  // Render loading/error/no-data states
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!user) return <div className="no-data">No user data found</div>;
@@ -241,11 +191,9 @@ export default function Profile() {
           style={{ width: "200px", borderRadius: "100%" }}
           onError={(e) => {
             // Fallback if image fails to load
-            e.currentTarget.src =
-              "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+            e.currentTarget.src = DEFAULT_AVATAR;
           }}
         />
-
         {/* Profile Details */}
         <h1 className="profile-name">{`${user.firstName} ${user.lastName}`}</h1>
         <p className="email-id">{user.email}</p>
@@ -255,19 +203,21 @@ export default function Profile() {
         <div className="bio">
           <b>Bio:</b> {user.bio || "No bio available"}
         </div>
-
         {/* Skills */}
         <div className="skills-section">
           <h3>Skills</h3>
-          <div className="skills">
-            {user.skills?.map((skill, index) => (
-              <div className="skill" key={index}>
+          <div className="chip-container">
+            {user.skills.map((skill, index) => (
+              <div key={index} className="chip">
                 {skill}
+                <span
+                  className="close-chip"
+                  onClick={() => removeSkill(index)}
+                ></span>
               </div>
             ))}
           </div>
         </div>
-
         {/* Social Links */}
         <div className="social-links">
           <h3>Social Links</h3>
@@ -289,32 +239,28 @@ export default function Profile() {
             )}
           </div>
         </div>
-
         {/* Interests */}
         <div className="interests-section">
           <h3>Interests</h3>
-          <div className="interests">
-            {user.interests?.map((interest, index) => (
-              <div className="interest" key={index}>
+          <div className="chip-container">
+            {user.interests.map((interest, index) => (
+              <div key={index} className="chip">
                 {interest}
               </div>
             ))}
           </div>
         </div>
-
         {/* Company Name */}
         {user.companyName && (
           <div className="company">
             <b>Company:</b> {user.companyName}
           </div>
         )}
-
         {/* Edit Button */}
         <button className="edit-btn" onClick={openEditDialog}>
           Edit Profile
         </button>
       </div>
-
       {/* Edit Dialog */}
       {isEditDialogOpen && (
         <div
@@ -335,7 +281,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* Last Name */}
               <div className="form-group">
                 <label>Last Name</label>
@@ -347,7 +292,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* Email */}
               <div className="form-group">
                 <label>Email</label>
@@ -359,7 +303,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* Department */}
               <div className="form-group">
                 <label>Department</label>
@@ -371,7 +314,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* Bio */}
               <div className="form-group">
                 <label>Bio</label>
@@ -382,7 +324,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* LinkedIn */}
               <div className="form-group">
                 <label>LinkedIn</label>
@@ -393,7 +334,6 @@ export default function Profile() {
                   onChange={handleInputChange}
                 />
               </div>
-
               {/* GitHub */}
               <div className="form-group">
                 <label>GitHub</label>
@@ -404,7 +344,6 @@ export default function Profile() {
                   onChange={handleInputChange}
                 />
               </div>
-
               {/* Twitter */}
               <div className="form-group">
                 <label>Twitter</label>
@@ -415,15 +354,14 @@ export default function Profile() {
                   onChange={handleInputChange}
                 />
               </div>
-
               {/* Interests */}
               <div className="form-group">
                 <label>Interests</label>
                 <div className="chip-input">
                   <div className="chip-container">
-                    {interests.map((interest, index) => (
+                    {interests.map((i, index) => (
                       <div key={index} className="chip">
-                        {interest}
+                        {i}
                         <span
                           className="close-chip"
                           onClick={() => removeInterest(index)}
@@ -450,7 +388,6 @@ export default function Profile() {
                   />
                 </div>
               </div>
-
               {/* Skills */}
               <div className="form-group">
                 <label>Skills</label>
@@ -485,7 +422,6 @@ export default function Profile() {
                   />
                 </div>
               </div>
-
               {/* Company Name */}
               <div className="form-group">
                 <label>Company Name</label>
@@ -496,7 +432,6 @@ export default function Profile() {
                   onChange={handleInputChange}
                 />
               </div>
-
               {/* Batch */}
               <div className="form-group">
                 <label>Batch</label>
@@ -508,7 +443,6 @@ export default function Profile() {
                   required
                 />
               </div>
-
               {/* Profile Image */}
               <div className="form-group">
                 <label>Profile Image (optional)</label>
@@ -519,7 +453,6 @@ export default function Profile() {
                   onChange={handleFileChange}
                 />
               </div>
-
               {/* Submit Buttons */}
               <button type="submit">Save Changes</button>
               <button

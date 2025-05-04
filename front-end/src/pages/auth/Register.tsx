@@ -16,7 +16,9 @@ export default function Register() {
   const [verificationError, setVerificationError] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [disableButton, setDisableButton] = useState<boolean>();
   const [formData, setFormData] = useState({
+    userName: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -88,6 +90,7 @@ export default function Register() {
 
         // Reset form and state
         setFormData({
+          userName: "",
           firstName: "",
           lastName: "",
           email: "",
@@ -138,6 +141,7 @@ export default function Register() {
                   onClick={() => {
                     handleRoleChange("user");
                   }}
+                  onFocus={() => setDisableButton(true)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -160,6 +164,7 @@ export default function Register() {
                   onClick={() => {
                     handleRoleChange("alumini");
                   }}
+                  onFocus={() => setDisableButton(true)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -182,6 +187,7 @@ export default function Register() {
                   onClick={() => {
                     setNext(true);
                   }}
+                  disabled={!disableButton}
                 >
                   Next
                 </button>
@@ -203,6 +209,17 @@ export default function Register() {
                     <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
                   </svg>
                 </div>
+                <label>
+                  Username
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    name="Username"
+                    value={formData.userName}
+                    onChange={handleChange}
+                    required
+                  />
+                </label>
                 <label className="username">
                   <label>
                     First Name

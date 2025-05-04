@@ -21,6 +21,7 @@ interface Follower {
 }
 
 interface Group {
+  userName: string;
   _id: string;
   groupTitle: string;
   groupDescription: string;
@@ -75,11 +76,11 @@ const FollowersDialog = ({
         className="mentor-dialog-box"
         onClick={(e) => e.stopPropagation()}
       >
+        <div onClick={onClose} style={{cursor: "pointer", width: "100%", position: "sticky", top: "0"}}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+        </div>
         <div className="dialog-header">
           <h2>Followers</h2>
-          <button onClick={onClose} className="close-button">
-            &times;
-          </button>
         </div>
         <div className="followers-list">
           {loading ? (
@@ -151,10 +152,10 @@ export default function Mentorship() {
     fetchGroups();
   }, [currentPage]);
 
-  const toggleFollow = async (groupId: string) => {
+  const toggleFollow = async (userName: string,groupId: string) => {
     try {
       await axios.post(
-        `${mainUrlPrefix}/mentorship/follow/${groupId}/${userId}`
+        `${mainUrlPrefix}/mentorship/follow/${groupId}/${userName}`
       );
       fetchGroups();
     } catch (error) {
@@ -309,7 +310,7 @@ export default function Mentorship() {
                   className="follow-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleFollow(group._id);
+                    toggleFollow(group.userName,  group._id);
                   }}
                 >
                   <svg
@@ -454,6 +455,9 @@ export default function Mentorship() {
             open={true}
             onClick={(e) => e.stopPropagation()}
           >
+            <div onClick={() => setSelectedGroup(null)} style={{cursor: "pointer", width: "100%", position: "sticky", top: "0"}}>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+            </div>
             <div className="post-top-bar">
               <div>
                 <h2>{selectedGroup.groupTitle}</h2>

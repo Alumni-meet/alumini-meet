@@ -3,6 +3,7 @@ import axios from "axios";
 import "./style/Batches.css";
 import { mainUrlPrefix } from "../main";
 
+
 export default function Batches() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState("");
@@ -10,7 +11,9 @@ export default function Batches() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterField, setFilterField] = useState<"all" | "name" | "dept" | "email" | "phone" | "linkedin" | "twitter">("all");
+  const [filterField, setFilterField] = useState<
+    "all" | "name" | "dept" | "email" | "phone" | "linkedin" | "twitter"
+  >("all");
 
   // Fetch all users on component mount
   useEffect(() => {
@@ -37,11 +40,13 @@ export default function Batches() {
   }, []);
 
   // Memoized filtered users for better performance
-  const filteredUsers = useMemo(() => {
+  const filteredUsers:any = useMemo(() => {
     if (!selectedBatch) return [];
-    
+
     // First filter by batch
-    const batchUsers = allUsers.filter((user: any) => user.batch == selectedBatch);
+    const batchUsers = allUsers.filter(
+      (user: any) => user.batch == selectedBatch
+    );
     if (!searchTerm.trim()) return batchUsers;
 
     const lowerSearchTerm = searchTerm.toLowerCase();
@@ -99,7 +104,7 @@ export default function Batches() {
   return (
     <div className="batches-body">
       <ul id="batches">
-        {Array.from({ length: 9 }, (_, index) => {
+        {Array.from({ length: 16 }, (_, index) => {
           const year = 2015 + index;
           return (
             <li key={year}>
@@ -114,7 +119,29 @@ export default function Batches() {
       {/* Dialog Box */}
       {isDialogOpen && (
         <div className="dialog-overlay" onClick={handleCloseDialog}>
-          <div className="batch-dialog-box" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="batch-dialog-box"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              onClick={handleCloseDialog}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                position: "sticky",
+                top: "0",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#fff"
+              >
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
+            </div>
             <div className="dialog-header">
               <h2 className="batch-selected-year">Batch of {selectedBatch}</h2>
               <div className="search-controls">
@@ -133,7 +160,9 @@ export default function Batches() {
                 </select>
                 <input
                   type="text"
-                  placeholder={`Search by ${filterField === "all" ? "any field" : filterField}...`}
+                  placeholder={`Search by ${
+                    filterField === "all" ? "any field" : filterField
+                  }...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="search-input"
@@ -155,6 +184,11 @@ export default function Batches() {
                 <ul className="user-list">
                   {filteredUsers.map((user: any) => (
                     <li key={user._id} className="user-item">
+                      {user.userImg && (
+                        <img
+                          src={`data:${user.userImg.contentType};base64,${user.userImg.data}`}
+                        />
+                      )}
                       <p>
                         <strong>Name:</strong> {user.firstName} {user.lastName}
                       </p>
