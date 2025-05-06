@@ -169,6 +169,17 @@ export default function Placement() {
       {isDialogOpen && (
         <div className="dialog-overlay">
           <div className="dialog-content">
+          <div
+            onClick={closeDialog}
+            style={{
+              cursor: "pointer",
+              width: "100%",
+              position: "sticky",
+              top: "0",
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+          </div>
             <h2>Check Resume Fit</h2>
             <input
               type="file"
@@ -209,6 +220,17 @@ export default function Placement() {
       {showDescriptionDialog && (
         <div className="dialog-overlay" onClick={handleCloseDescriptionDialog}>
           <div className="dialog-box" onClick={(e) => e.stopPropagation()}>
+          <div
+            onClick={handleCloseDescriptionDialog}
+            style={{
+              cursor: "pointer",
+              width: "100%",
+              position: "sticky",
+              top: "0",
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+          </div>
             <h3>Job Description</h3>
             <div className="description-content">
               {selectedDescription.split("\n").map((line, index) => (

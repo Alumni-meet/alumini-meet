@@ -214,9 +214,10 @@ export default function Register() {
                   <input
                     type="text"
                     placeholder="Username"
-                    name="Username"
+                    name="userName"
                     value={formData.userName}
                     onChange={handleChange}
+                    title="Give a unique username"
                     required
                   />
                 </label>
@@ -344,7 +345,7 @@ export default function Register() {
           isVerificationDialogOpen ? "active" : ""
         }`}
       >
-        <div className="verification-dialog">
+        <div className="dialog-box">
           <h2>Email Verification</h2>
           <p>We've sent a 4-digit code to {registeredEmail}</p>
           <form onSubmit={handleVerificationSubmit}>

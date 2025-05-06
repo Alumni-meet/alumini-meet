@@ -25,10 +25,10 @@ export default function TopCompanies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [remarks, setRemarks] = useState<{ [key: string]: string }>({});
   const [activeFormCompanyId, setActiveFormCompanyId] = useState<string | null>(
-    null,
+    null
   );
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
-    null,
+    null
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,6 @@ export default function TopCompanies() {
         setLoading(false);
       }
     }
-
     fetchCompanies();
   }, []);
 
@@ -58,15 +57,14 @@ export default function TopCompanies() {
       async function fetchUserName() {
         try {
           const response = await axios.get(
-            `${mainUrlPrefix}/user/getUser/${userId}`,
+            `${mainUrlPrefix}/user/getUser/${userId}`
           );
-          setUserName(response.data.userDetail.firstName);
+          setUserName(response.data.firstName);
         } catch (error) {
           console.error("Error fetching user name:", error);
           setError("Failed to fetch user name. Please try again.");
         }
       }
-
       fetchUserName();
     }
   }, [userId]);
@@ -74,23 +72,21 @@ export default function TopCompanies() {
   // Handle comment submission (create or update)
   const handleCommentSubmission = async (
     companyId: string,
-    e: React.FormEvent,
+    e: React.FormEvent
   ) => {
     e.preventDefault();
     const remarkText = remarks[companyId]?.trim();
     if (!remarkText) return;
-
     try {
       // Check if the user already has a comment
       const existingComment = companies
         .find((c) => c._id === companyId)
         ?.alumni.find((alum) => alum._id === userId);
-
       if (existingComment) {
         // Update existing comment via PUT
         await axios.put(
           `${mainUrlPrefix}/top-companies/${companyId}/alumni/${userId}`,
-          { remarks: remarkText },
+          { remarks: remarkText }
         );
       } else {
         // Create new comment via POST
@@ -99,12 +95,11 @@ export default function TopCompanies() {
           remarks: remarkText,
         });
       }
-
       // Refresh companies
       setRemarks((prev) => ({ ...prev, [companyId]: "" }));
       setActiveFormCompanyId(null);
       const updatedCompanies = await axios.get(
-        `${mainUrlPrefix}/top-companies/`,
+        `${mainUrlPrefix}/top-companies/`
       );
       setCompanies(updatedCompanies.data);
     } catch (error) {
@@ -143,8 +138,8 @@ export default function TopCompanies() {
             />
             <h2>{company.name}</h2>
             <div className="company-description-container">
-                <p className="company-description">{company.description}</p>
-                <div className="top-company-actions">
+              <p className="company-description">{company.description}</p>
+              <div className="top-company-actions">
                 {company.description && (
                   <button onClick={() => setSelectedCompanyId(company._id)}>
                     Know More
@@ -157,7 +152,14 @@ export default function TopCompanies() {
                   className="top-company-link"
                 >
                   Visit Website
-                  <svg xmlns="http://www.w3.org/2000/svg" height="1rem" viewBox="0 -960 960 960" fill="#fff"><path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="1rem"
+                    viewBox="0 -960 960 960"
+                    fill="#fff"
+                  >
+                    <path d="m136-240-56-56 296-298 160 160 208-206H640v-80h240v240h-80v-104L536-320 376-480 136-240Z" />
+                  </svg>
                 </a>
               </div>
             </div>
@@ -170,6 +172,25 @@ export default function TopCompanies() {
           onClick={() => setSelectedCompanyId(null)}
         >
           <div className="dialog-box" onClick={(e) => e.stopPropagation()}>
+            <div
+              onClick={() => setSelectedCompanyId(null)}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                position: "sticky",
+                top: "0",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#222"
+              >
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
+            </div>
             <h3>{selectedCompany.name}</h3>
             <div className="description-content">
               {selectedCompany.description
@@ -185,7 +206,7 @@ export default function TopCompanies() {
               ) : (
                 <div className="comments-grid">
                   {selectedCompany.alumni.map((alum, index) => (
-                    <div key={index} className="comment-card">
+                    <div key={index} className="alumni-comment-card">
                       <div className="comment-header">
                         <div className="user-info">
                           <strong>{userName}</strong>
@@ -210,24 +231,24 @@ export default function TopCompanies() {
                                 onClick={async () => {
                                   if (
                                     window.confirm(
-                                      "Are you sure you want to delete this comment?",
+                                      "Are you sure you want to delete this comment?"
                                     )
                                   ) {
                                     try {
                                       await axios.delete(
-                                        `${mainUrlPrefix}/top-companies/${selectedCompany._id}/alumni/${alum._id}`,
+                                        `${mainUrlPrefix}/top-companies/${selectedCompany._id}/alumni/${alum._id}`
                                       );
                                       const updatedCompanies = await axios.get(
-                                        `${mainUrlPrefix}/top-companies/`,
+                                        `${mainUrlPrefix}/top-companies/`
                                       );
                                       setCompanies(updatedCompanies.data);
                                     } catch (error) {
                                       console.error(
                                         "Error deleting comment:",
-                                        error,
+                                        error
                                       );
                                       setError(
-                                        "Failed to delete comment. Please try again.",
+                                        "Failed to delete comment. Please try again."
                                       );
                                     }
                                   }
@@ -252,7 +273,7 @@ export default function TopCompanies() {
                         setActiveFormCompanyId(
                           activeFormCompanyId === selectedCompany._id
                             ? null
-                            : selectedCompany._id,
+                            : selectedCompany._id
                         )
                       }
                       className="add-company-btn"

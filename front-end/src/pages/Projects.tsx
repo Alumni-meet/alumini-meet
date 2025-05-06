@@ -6,6 +6,7 @@ import { mainUrlPrefix } from "../main";
 interface Project {
   _id: string;
   userId: string;
+  userName: string;
   projectTitle: string;
   projectDescription: string;
   gitLink: string;
@@ -18,12 +19,14 @@ interface Project {
 export default function Projects() {
   const [tab, setTab] = useState<"Explore" | "Yours">("Explore");
   const userId = sessionStorage.getItem("user")?.trim();
+  const userName = sessionStorage.getItem("userName")!;
   const role = sessionStorage.getItem("role")?.trim();
   const [projects, setProjects] = useState<Project[]>([]);
   const [fundRaiser, setFundRaiser] = useState(false);
   const [addProjectForm, setAddProjectForm] = useState(false);
   const [editProjectForm, setEditProjectForm] = useState<Project | null>(null);
   const [formData, setFormData] = useState({
+    userName: userName,
     projectTitle: "",
     projectDescription: "",
     gitLink: "",
@@ -53,7 +56,9 @@ export default function Projects() {
   }, [userId, role, fetchProjects]);
 
   // Handle input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -62,13 +67,14 @@ export default function Projects() {
   };
 
   // Handle file uploads
-  const handleFileChange = (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: file,
-    }));
-  };
+  const handleFileChange =
+    (fieldName: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: file,
+      }));
+    };
 
   // Add a new project
   const handleAddProject = async (e: React.FormEvent) => {
@@ -78,10 +84,11 @@ export default function Projects() {
       formDataToSend.append("projectTitle", formData.projectTitle);
       formDataToSend.append("projectDescription", formData.projectDescription);
       formDataToSend.append("gitLink", formData.gitLink);
+      formDataToSend.append("userName", formData.userName);
       if (formData.upiQR) {
         formDataToSend.append("upiQR", formData.upiQR);
       }
-      const response = await axios.post(
+      await axios.post(
         `${mainUrlPrefix}/project/addProject/${userId}`,
         formDataToSend,
         { headers: { "Content-Type": "multipart/form-data" } }
@@ -90,18 +97,19 @@ export default function Projects() {
         "FormData to send:",
         Object.fromEntries(formDataToSend.entries())
       );
-      if (response.data.status === "success") {
-        setAddProjectForm(false);
-        setFormData({
-          projectTitle: "",
-          projectDescription: "",
-          gitLink: "",
-          upiQR: null,
-        });
-        fetchProjects();
-      }
     } catch (error) {
       console.error("Failed to add project:", error);
+    } finally {
+      setAddProjectForm(false);
+      setFundRaiser(false); // Reset fundraiser state
+      setFormData({
+        userName: userName,
+        projectTitle: "",
+        projectDescription: "",
+        gitLink: "",
+        upiQR: null,
+      });
+      fetchProjects();
     }
   };
 
@@ -109,6 +117,7 @@ export default function Projects() {
   const handleEditProject = (project: Project) => {
     setEditProjectForm(project);
     setFormData({
+      userName: project.userName,
       projectTitle: project.projectTitle,
       projectDescription: project.projectDescription,
       gitLink: project.gitLink,
@@ -124,33 +133,37 @@ export default function Projects() {
       formDataToSend.append("projectTitle", formData.projectTitle);
       formDataToSend.append("projectDescription", formData.projectDescription);
       formDataToSend.append("gitLink", formData.gitLink);
+      formDataToSend.append("username", formData.userName);
       if (formData.upiQR) {
         formDataToSend.append("upiQR", formData.upiQR);
       }
-      const response = await axios.patch(
+      await axios.patch(
         `${mainUrlPrefix}/project/editProject/${editProjectForm?._id}`,
         formDataToSend,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      if (response.data.status === "success") {
-        setEditProjectForm(null);
-        setFormData({
-          projectTitle: "",
-          projectDescription: "",
-          gitLink: "",
-          upiQR: null,
-        });
-        fetchProjects();
-      }
     } catch (error) {
       console.error("Failed to update project:", error);
+    }finally {
+      setAddProjectForm(false);
+      setFundRaiser(false);
+      setFormData({
+        userName: userName,
+        projectTitle: "",
+        projectDescription: "",
+        gitLink: "",
+        upiQR: null,
+      });
+      fetchProjects();
     }
   };
 
   // Delete a project
   const handleDeleteProject = async (projectId: string) => {
     try {
-      const response = await axios.delete(`${mainUrlPrefix}/project/deleteProject/${projectId}`);
+      const response = await axios.delete(
+        `${mainUrlPrefix}/project/deleteProject/${projectId}`
+      );
       if (response.data.status === "success") {
         fetchProjects();
       }
@@ -321,7 +334,7 @@ export default function Projects() {
                     />
                   </div>
                 )}
-                <div className="modal-buttons">
+                <div className="form-actions">
                   <button type="submit" className="submit-btn">
                     Add Project
                   </button>
@@ -384,7 +397,7 @@ export default function Projects() {
                     />
                   </div>
                 )}
-                <div className="modal-buttons">
+                <div className="form-actions">
                   <button type="submit" className="submit-btn">
                     Update Project
                   </button>

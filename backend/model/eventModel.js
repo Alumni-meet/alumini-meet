@@ -12,7 +12,6 @@ const EventSchema = new mongoose.Schema({
         }
     },
     postedBy: {
-        userId:String,
         userName: String,
         trim: true,
     },

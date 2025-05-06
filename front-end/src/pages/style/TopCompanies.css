@@ -217,9 +217,8 @@
   display: flex;
   flex-direction: column;
 }
-.comment-card {
-  background: #fff;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.alumni-comment-card {
+  padding: 1rem;
 }
 
 .comment-header {
@@ -272,6 +271,7 @@
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  gap: .5rem;
 }
 .top-company-link {
   padding: 0.5rem 1rem;

@@ -24,92 +24,46 @@
 
 /* Event Details */
 .event-details,
-.project-details,
-.user-details {
+.project-details{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 25rem;
+  height: 30rem;
   overflow: hidden;
   background-color: #fff;
   padding: 0;
 }
 
 .user-details {
-  background-image: linear-gradient(-45deg, #f4d35e, #ffafcc, #a2d2ff);
+  height: 90vh;
+  background-image: linear-gradient(transparent,transparent, #ffffff),linear-gradient(-45deg, #f4d35e, #ffafcc, #a2d2ff);
+  text-align: center;
+  border-radius: 1rem;
   display: flex;
+  align-items:center;
   flex-direction: column;
-  justify-content: start;
-  align-items: center;
-  padding: 3rem;
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-  clip-path: polygon(
-    100% 0%,
-    0% 0%,
-    0% 66.09%,
-    2% 64.92%,
-    4% 64%,
-    6% 63.45%,
-    8% 63.35%,
-    10% 63.72%,
-    12% 64.51%,
-    14% 65.59%,
-    16% 66.83%,
-    18% 68.04%,
-    20% 69.06%,
-    22% 69.75%,
-    24% 70%,
-    26% 69.78%,
-    28% 69.13%,
-    30% 68.13%,
-    32% 66.92%,
-    34% 65.68%,
-    36% 64.58%,
-    38% 63.77%,
-    40% 63.37%,
-    42% 63.43%,
-    44% 63.94%,
-    46% 64.84%,
-    48% 66%,
-    50% 67.25%,
-    52% 68.41%,
-    54% 69.34%,
-    56% 69.88%,
-    58% 69.98%,
-    60% 69.61%,
-    62% 68.83%,
-    64% 67.74%,
-    66% 66.5%,
-    68% 65.29%,
-    70% 64.27%,
-    72% 63.58%,
-    74% 63.33%,
-    76% 63.55%,
-    78% 64.21%,
-    80% 65.21%,
-    82% 66.41%,
-    84% 67.65%,
-    86% 68.76%,
-    88% 69.56%,
-    90% 69.97%,
-    92% 69.91%,
-    94% 69.39%,
-    96% 68.49%,
-    98% 67.34%,
-    100% 66.09%
-  );
 }
-.user-details > * {
-  scale: 115%;
+.home-title {
+  width: 100%;
+  padding: 1rem;
+  font-size: max(4rem, 50px);
+  mix-blend-mode:difference;
+  opacity: .5;
+}
+.home-content{
+  text-align: center;
+  width: 50%;
+  scale: 125%;
+  color: #ffffff;
 }
 .event-card-container,
 .project-card-container {
-  height: 20rem;
+  height: 25rem;
   width: 100%;
   position: relative;
-  gap: 5px;
+  gap: 1rem;
+  padding: 0 1rem;
   display: flex;
   align-items: center;
   justify-content: start;
@@ -119,7 +73,7 @@
   border-radius: 0.5rem;
   height: 15rem;
   max-width: 30%;
-  min-width: 20rem;
+  min-width: 15rem;
   padding: 1rem;
   overflow: hidden;
   border: 1px solid #33333355;
@@ -139,7 +93,7 @@
   visibility: hidden;
   z-index: 10;
   opacity: 0;
-  transition: .5s all ease;
+  transition: .2s all ease;
 }
 .event-card-container:hover .knowMoreOverlay,
 .project-card-container:hover .knowMoreOverlay{

@@ -9,7 +9,7 @@ const handleFileUpload = upload.fields([{ name: 'upiQR', maxCount: 1 }]);
 
 const addProject = async (req, res) => {
   try {
-    const { projectTitle, projectDescription, gitLink } = req.body;
+    const { projectTitle, projectDescription, gitLink, userName } = req.body;
     const userId = req.params.userId;
 
     // Handle file upload
@@ -24,7 +24,7 @@ const addProject = async (req, res) => {
 
     const newProject = new Project({
       userId,
-      username,
+      userName,
       projectTitle,
       projectDescription,
       gitLink,
@@ -118,8 +118,18 @@ const editProject = async (req, res) => {
       projectTitle: req.body.projectTitle,
       projectDescription: req.body.projectDescription,
       gitLink: req.body.gitLink,
-      upiQR: req.body.upiQR 
+      upiQR: req.body.upiQR,
+      userName: req.body.userName
     };
+    
+     if (req.files && req.files.upiQR) {
+      const upiQRFile = req.files.upiQR[0];
+      updatedProject.upiQR = {
+        data: upiQRFile.buffer,
+        contentType: upiQRFile.mimetype
+      };
+    }
+
     const result = await Project.findByIdAndUpdate(projectId, updatedProject, {
       new: true,
     });

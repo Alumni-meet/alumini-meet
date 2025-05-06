@@ -6,14 +6,16 @@ const addReferral = async (req, res) => {
         referraltitle: req.body.referraltitle,
         jobDescription: req.body.jobDescription,
         applyLink: req.body.applyLink,
-        userId: req.params.id
+        userId: req.params.id,
+        userName: req.body.userName,
     });
 
     const referralDetail = {
       referraltitle: referral.referraltitle,
       jobDescription: referral.jobDescription,
       applyLink: referral.applyLink,
-      userId: referral.userId
+      userId: referral.userId,
+      userName: referral.userName,
     };
 
     res.status(200).json({

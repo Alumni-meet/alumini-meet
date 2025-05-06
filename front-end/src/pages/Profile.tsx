@@ -246,9 +246,9 @@ export default function Profile() {
           }}
         />
         {/* Profile Details */}
-        <h1 className="profile-name">{`${user.firstName} ${user.lastName}`}</h1>
+        <h1 className="home-title">{`${user.firstName} ${user.lastName}`}</h1>
         <h3><b>User Name  : </b>{user.userName}</h3>
-        <p className="email-id">{user.email}</p>
+        <p className="email-id">Email: {user.email}</p>
         <p className="education">
           <b>Education:</b> {user.dept}, {user.batch}
         </p>

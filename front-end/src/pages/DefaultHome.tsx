@@ -94,14 +94,16 @@ export default function DefaultHome() {
     <div className="home-container">
       <div className="home-card user-details">
         <h2 className="home-title">{`${user.firstName} ${user.lastName}`}</h2>
-        <p>
-          <b>Email:</b> {user.email}
-        </p>
-        <p>
-          <b>Education:</b> {user.dept}, {user.batch}
-        </p>
-        <div className="bio">
-          <b>Bio:</b> {user.bio || "No bio available"}
+        <div className="home-content">
+          <p>
+            <b>Email:</b> {user.email}
+          </p>
+          <p>
+            <b>Education:</b> {user.dept}, {user.batch}
+          </p>
+          <div className="bio">
+            <b>Bio:</b> {user.bio || "No bio available"}
+          </div>
         </div>
       </div>
 

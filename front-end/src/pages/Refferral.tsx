@@ -9,6 +9,7 @@ interface Refferal {
   jobDescription: string;
   applyLink: string;
   userId: string;
+  userName: string;
 }
 
 export default function Referrals() {
@@ -51,9 +52,7 @@ export default function Referrals() {
       } else if (tab === "Yours") {
         endpoint = `${mainUrlPrefix}/referral/getUserReferrals/${userId}`;
       }
-
       const response = await axios.get(endpoint);
-
       if (response.data.status === "Success") {
         // Set referrals to the array from the response, or empty array if none
         setReferrals(
@@ -75,7 +74,7 @@ export default function Referrals() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [tab, userId]);
 
   useEffect(() => {
     fetchReferrals();
@@ -92,6 +91,7 @@ export default function Referrals() {
     }));
   };
 
+  const userName = sessionStorage.getItem("userName")
   // Add a new referral
   const handleAddReferral = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +100,7 @@ export default function Referrals() {
         referraltitle: formData.referraltitle,
         jobDescription: formData.jobDescription,
         applyLink: formData.applyLink,
+        userName: userName
       };
       const response = await axios.post(
         `${mainUrlPrefix}/referral/addReferral/${userId}`,
@@ -206,6 +207,7 @@ export default function Referrals() {
           referrals.map((referral: Refferal) => (
             <div key={referral._id} className="project-card">
               <h3>{referral.referraltitle}</h3>
+              <p>by {referral.userName}</p>
               <div className="referral-description">
                 <p className="truncated">{referral.jobDescription}</p>
                 {referral.jobDescription.length > 150 && (

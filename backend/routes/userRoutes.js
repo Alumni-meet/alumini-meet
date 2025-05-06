@@ -9,6 +9,7 @@ const {
   validateUser,
   updateProfile,
   getUserById,
+  getUserByUserName
 } = require("../controller/userController");
 
 // Route to send OTP
@@ -28,5 +29,7 @@ router.get("/getUser/:userId", getUserById);
 
 // Route to register admin
 router.post("/registerAdmin", registerAdmin);
+
+router.get("/getUserByUserName/:userName", getUserByUserName)
 
 module.exports = router;

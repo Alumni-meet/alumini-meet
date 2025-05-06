@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Add a new mentorship group with an initial post
 async function AddGroup(req, res) {
   try {
-    const { userId, groupTitle, groupDescription, title, description } = req.body;
+    const { userId, groupTitle, groupDescription, title, description, ownerName } = req.body;
 
     // Validate required fields
     if (!userId || !groupTitle || !groupDescription) {
@@ -19,6 +19,7 @@ async function AddGroup(req, res) {
     const newMentorship = new Mentorship({
       userId,
       groupTitle,
+      ownerName,
       groupDescription,
       posts: req.file
         ? [
@@ -234,11 +235,11 @@ async function ToggleFollow(req, res) {
     }
 
     // Check if user is already following
-    const isFollowing = mentorship.followers.includes(userId);
+    const isFollowing = mentorship.followers.includes(userName);
 
     if (isFollowing) {
       // Unfollow: Remove user from followers
-      mentorship.followers = mentorship.followers.filter((id) => id !== userId);
+      mentorship.followers = mentorship.followers.filter((id) => id !== userName);
     } else {
       // Follow: Add user to followers
       mentorship.followers.push(userName);

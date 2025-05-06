@@ -10,6 +10,7 @@ import "./style/Profile.css";
 import { mainUrlPrefix } from "../main";
 
 interface User {
+  userName: string;
   _id: string;
   firstName: string;
   lastName: string;
@@ -195,8 +196,9 @@ export default function Profile() {
           }}
         />
         {/* Profile Details */}
-        <h1 className="profile-name">{`${user.firstName} ${user.lastName}`}</h1>
-        <p className="email-id">{user.email}</p>
+        <h1 className="home-title">{`${user.firstName} ${user.lastName}`}</h1>
+        <p><b>Username: </b>{user.userName}</p>
+        <p className="email-id"><b>Email:</b> {user.email}</p>
         <p className="education">
           <b>Education:</b> {user.dept}, {user.batch}
         </p>
@@ -454,17 +456,19 @@ export default function Profile() {
                 />
               </div>
               {/* Submit Buttons */}
-              <button type="submit">Save Changes</button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsEditDialogOpen(false);
-                  setFormData({});
-                  setSelectedFile(null);
-                }}
-              >
-                Cancel
-              </button>
+              <div className="form-actions">
+                <button type="submit">Save Changes</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditDialogOpen(false);
+                    setFormData({});
+                    setSelectedFile(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
             </form>
           </div>
         </div>

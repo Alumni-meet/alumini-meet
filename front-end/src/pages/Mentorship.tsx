@@ -13,19 +13,12 @@ function arrayBufferToBase64(buffer: number[]): string {
   return window.btoa(binary);
 }
 
-interface Follower {
-  _id: string;
-  name: string;
-  dept: string;
-  batch: string;
-}
-
 interface Group {
-  userName: string;
   _id: string;
   groupTitle: string;
   groupDescription: string;
   userId: string;
+  ownerName: string;
   followers: string[];
   posts: {
     _id: string;
@@ -40,63 +33,234 @@ interface Group {
   }[];
 }
 
-const FollowersDialog = ({
-  groupId,
-  onClose,
-}: {
-  groupId: string;
+interface User {
+  _id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dept: string;
+  batch: string;
+  bio?: string;
+  skills?: string[];
+  interests?: string[];
+  linkedIn?: string;
+  github?: string;
+  twitter?: string;
+  companyName?: string;
+  role: string;
+  userImg?: string | { data: number[]; contentType: string };
+}
+
+interface FollowersDialogProps {
+  followers: string[];
   onClose: () => void;
+}
+
+const FollowersDialog: React.FC<FollowersDialogProps> = ({
+  followers,
+  onClose,
 }) => {
-  const [followers, setFollowers] = useState<Follower[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedUserName, setSelectedUserName] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [profileDialog, setProfileDialog] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchFollowers = async () => {
+    if (!selectedUserName) return;
+
+    const fetchUserProfile = async () => {
       try {
         const response = await axios.get(
-          `${mainUrlPrefix}/mentorship/followers/${groupId}`
+          `${mainUrlPrefix}/user/getUserByUserName/${selectedUserName}`
         );
-        setFollowers(response.data);
+        setUser(response.data);
       } catch (error) {
-        console.error("Error fetching followers:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching profile:", error);
       }
     };
 
-    if (groupId) {
-      fetchFollowers();
+    fetchUserProfile();
+  }, [selectedUserName]);
+
+  const DEFAULT_AVATAR =
+  "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+
+
+  const getImageUrl = (userData: User | null): string => {
+    if (!userData?.userImg) return DEFAULT_AVATAR;
+    // If userImg is already a URL string
+    if (typeof userData.userImg === "string") {
+      return userData.userImg.startsWith("http")
+        ? userData.userImg
+        : DEFAULT_AVATAR;
     }
-  }, [groupId]);
+    // If userImg is an object with data and contentType
+    if (userData.userImg.data && userData.userImg.contentType) {
+      return `data:${userData.userImg.contentType};base64,${userData.userImg.data}`;
+    }
+    return DEFAULT_AVATAR;
+  };
 
   return (
-    <div className="dialog-overlay" onClick={onClose}>
+    <div
+      className="dialog-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
       <dialog
         open
         className="mentor-dialog-box"
         onClick={(e) => e.stopPropagation()}
       >
-        <div onClick={onClose} style={{cursor: "pointer", width: "100%", position: "sticky", top: "0"}}>
+        {!profileDialog ? (
+          <>
+            <div
+              onClick={onClose}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                position: "sticky",
+                top: "0",
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+            </div>
+            <div className="dialog-header">
+              <h2>Followers</h2>
+            </div>
+            <div className="followers-list">
+              {followers.length > 0 ? (
+                followers.map((username) => (
+                  <div
+                    key={username}
+                    className="follower-item"
+                    onClick={() => {
+                      setSelectedUserName(username);
+                      setProfileDialog(true);
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View profile for ${username}`}
+                  >
+                    <p title={`Visit ${username}'s profile`}>{username}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No followers yet</p>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="profile-container">
+            <div
+            onClick={() => setProfileDialog(false)}
+            style={{
+              cursor: "pointer",
+              width: "100%",
+              position: "sticky",
+              top: "0",
+            }}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
-        </div>
-        <div className="dialog-header">
-          <h2>Followers</h2>
-        </div>
-        <div className="followers-list">
-          {loading ? (
-            <p>Loading followers...</p>
-          ) : followers.length > 0 ? (
-            followers.map((follower) => (
-              <div key={follower._id} className="follower-item">
-                <h3>{follower.name}</h3>
-                <p>Department: {follower.dept}</p>
-                <p>Batch: {follower.batch}</p>
-              </div>
-            ))
-          ) : (
-            <p>No followers yet</p>
-          )}
-        </div>
+          </div>
+            <div className="profile-card" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={getImageUrl(user)}
+                alt="User"
+                className="profile-img"
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+                }}
+              />
+              {user && (
+                <>
+                  <h1 className="home-title">{`${user.firstName} ${user.lastName}`}</h1>
+                  <p>
+                    <b>User Name:</b> {user.userName}
+                  </p>
+                  <p>
+                    <b>Email:</b> {user.email}
+                  </p>
+                  <p>
+                    <b>Education:</b> {user.dept}, {user.batch}
+                  </p>
+                  <p>
+                    <b>Bio:</b> {user.bio || "No bio available"}
+                  </p>
+  
+                  {user.skills!.length > 0 && (
+                    <div>
+                      <h3>Skills</h3>
+                      <div className="skills">
+                        {user.skills!.map((s, i) => (
+                          <div className="chip" key={i}>
+                            {s}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+  
+                  {(user.linkedIn || user.github || user.twitter) && (
+                    <div>
+                      <h3>Social Links</h3>
+                      <div className="links">
+                        {user.linkedIn && (
+                          <a
+                            href={user.linkedIn}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            LinkedIn
+                          </a>
+                        )}
+                        {user.github && (
+                          <a
+                            href={user.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            GitHub
+                          </a>
+                        )}
+                        {user.twitter && (
+                          <a
+                            href={user.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Twitter
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+  
+                  {user.interests!.length > 0 && (
+                    <div>
+                      <h3>Interests</h3>
+                      <div className="chip">
+                        {user.interests!.map((i, ix) => (
+                          <div className="interest" key={ix}>
+                            {i}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+  
+                  {user.companyName && (
+                    <p>
+                      <b>Company:</b> {user.companyName}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </dialog>
     </div>
   );
@@ -106,6 +270,7 @@ export default function Mentorship() {
   const [community, setCommunity] = useState<Group[]>([]);
   const [following, setFollowing] = useState<Group[]>([]);
   const userId = sessionStorage.getItem("user")!;
+  const userName = sessionStorage.getItem("userName")!;
   const role = sessionStorage.getItem("role")!;
   const [currentPage, setCurrentPage] = useState("explore");
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -132,7 +297,7 @@ export default function Mentorship() {
       else if (currentPage === "yours")
         url = `${mainUrlPrefix}/mentorship/get/${userId}`;
       else if (currentPage === "following")
-        url = `${mainUrlPrefix}/mentorship/followed/${userId}`;
+        url = `${mainUrlPrefix}/mentorship/followed/${userName}`;
 
       const response = await axios.get(url);
       if (currentPage === "following") {
@@ -152,7 +317,7 @@ export default function Mentorship() {
     fetchGroups();
   }, [currentPage]);
 
-  const toggleFollow = async (userName: string,groupId: string) => {
+  const toggleFollow = async (userName: string, groupId: string) => {
     try {
       await axios.post(
         `${mainUrlPrefix}/mentorship/follow/${groupId}/${userName}`
@@ -167,6 +332,7 @@ export default function Mentorship() {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userId", userId);
+    formData.append("ownerName", userName);
     formData.append("groupTitle", groupTitle);
     formData.append("groupDescription", groupDescription);
     if (image) formData.append("image", image);
@@ -300,6 +466,7 @@ export default function Mentorship() {
               >
                 <div className="nameHolder">
                   <h2>{group.groupTitle}</h2>
+                  <p>by {group.ownerName}</p>
                   <p>{group.groupDescription}</p>
                   <p>
                     <strong>Followers: </strong>
@@ -310,7 +477,7 @@ export default function Mentorship() {
                   className="follow-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleFollow(group.userName,  group._id);
+                    toggleFollow(userName, group._id);
                   }}
                 >
                   <svg
@@ -320,7 +487,7 @@ export default function Mentorship() {
                     width="24px"
                     fill="#fff"
                     className={
-                      group.followers.includes(userId)
+                      group.followers.includes(userName)
                         ? "svgFollow"
                         : "svgUnfollow"
                     }
@@ -349,6 +516,7 @@ export default function Mentorship() {
               >
                 <div className="nameHolder">
                   <h2>{group.groupTitle}</h2>
+                  <p>by {group.ownerName}</p>
                   <p>{group.groupDescription}</p>
                   <p>
                     <strong>Followers: </strong>
@@ -359,7 +527,7 @@ export default function Mentorship() {
                   className="follow-btn"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toggleFollow(group._id);
+                    toggleFollow(userName, group._id);
                   }}
                 >
                   <svg
@@ -369,7 +537,7 @@ export default function Mentorship() {
                     width="24px"
                     fill="#fff"
                     className={
-                      group.followers.includes(userId)
+                      group.followers.includes(userName)
                         ? "svgFollow"
                         : "svgUnfollow"
                     }
@@ -455,15 +623,31 @@ export default function Mentorship() {
             open={true}
             onClick={(e) => e.stopPropagation()}
           >
-            <div onClick={() => setSelectedGroup(null)} style={{cursor: "pointer", width: "100%", position: "sticky", top: "0"}}>
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+            <div
+              onClick={() => setSelectedGroup(null)}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                position: "sticky",
+                top: "0",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#222"
+              >
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
             </div>
             <div className="post-top-bar">
               <div>
                 <h2>{selectedGroup.groupTitle}</h2>
                 <p>{selectedGroup.groupDescription}</p>
                 <div
-                  className="followers-clickable"
+                  className="followers-count"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowFollowersDialog(true);
@@ -559,7 +743,7 @@ export default function Mentorship() {
       {/* Followers Dialog */}
       {showFollowersDialog && selectedGroup && (
         <FollowersDialog
-          groupId={selectedGroup._id}
+          followers={selectedGroup.followers}
           onClose={() => setShowFollowersDialog(false)}
         />
       )}

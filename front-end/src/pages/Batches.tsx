@@ -4,6 +4,25 @@ import "./style/Batches.css";
 import { mainUrlPrefix } from "../main";
 
 
+interface User {
+  _id: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  dept: string;
+  batch: string;
+  bio?: string;
+  skills?: string[];
+  interests?: string[];
+  linkedIn?: string;
+  github?: string;
+  twitter?: string;
+  companyName?: string;
+  role: string;
+  userImg?: string | { data: number[]; contentType: string };
+}
+
 export default function Batches() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState("");
@@ -101,6 +120,25 @@ export default function Batches() {
     setFilterField("all");
   };
 
+  const DEFAULT_AVATAR =
+  "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+
+
+  const getImageUrl = (userData: User| null): string => {
+    if (!userData?.userImg) return DEFAULT_AVATAR;
+    // If userImg is already a URL string
+    if (typeof userData.userImg === "string") {
+      return userData.userImg.startsWith("http")
+        ? userData.userImg
+        : DEFAULT_AVATAR;
+    }
+    // If userImg is an object with data and contentType
+    if (userData.userImg.data && userData.userImg.contentType) {
+      return `data:${userData.userImg.contentType};base64,${userData.userImg.data}`;
+    }
+    return DEFAULT_AVATAR;
+  };
+
   return (
     <div className="batches-body">
       <ul id="batches">
@@ -186,8 +224,14 @@ export default function Batches() {
                     <li key={user._id} className="user-item">
                       {user.userImg && (
                         <img
-                          src={`data:${user.userImg.contentType};base64,${user.userImg.data}`}
-                        />
+                        src={getImageUrl(user)}
+                        alt="User"
+                        className="profile-img"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+                        }}
+                      />
                       )}
                       <p>
                         <strong>Name:</strong> {user.firstName} {user.lastName}

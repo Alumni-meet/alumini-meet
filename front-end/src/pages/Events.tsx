@@ -45,7 +45,6 @@ export default function Events() {
   const fetchEvents = async () => {
     try {
       const response = await axios.get(`${mainUrlPrefix}/event/getAllEvents`);
-      console.log(response.data.events);
       setEvents(response.data.events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -113,7 +112,7 @@ export default function Events() {
         );
         alert("Event updated successfully!");
       } else {
-        await axios.post(`${mainUrlPrefix}/event/addEvent`, formDataToSend, {
+      await axios.post(`${mainUrlPrefix}/event/addEvent/${currentUserName}`, formDataToSend, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         alert("Event added successfully!");
@@ -208,6 +207,7 @@ export default function Events() {
               <div className="event-item">
                 <img src={getImageUrl(event)} alt="event image" />
                 <div className="event-title">{event.eventTitle}</div>
+                <div className="event-description"><p>by {(event.postedBy) ? event.postedBy : "College"}</p></div>
                 <div className="event-description">
                   {event.eventDescription}
                 </div>

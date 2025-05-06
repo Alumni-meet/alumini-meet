@@ -100,6 +100,7 @@ const verifyOTP = async (req, res) => {
 
     // Create new user, include userImg if provided
     const user = await User.create({
+      userName: userData.userName,
       firstName: userData.firstName,
       lastName: userData.lastName,
       email: userData.email,
@@ -179,7 +180,7 @@ const validateUser = async (req, res) => {
     }
 
     const userDetail = {
-      userName: req.body.userName,
+      userName: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -217,16 +218,16 @@ const updateProfile = async (req, res) => {
     if (req.file) {
       updateData.userImg = {
         data: req.file.buffer,
-        contentType: req.file.mimetype
+        contentType: req.file.mimetype,
       };
     }
-    
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.userId,
       updateData,
       { new: true }
     );
-    
+
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -237,13 +238,30 @@ const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) return res.status(404).json({ error: "User not found" });
-    
+
     const userObj = user.toObject();
-    
+
     if (userObj.userImg?.data) {
-      userObj.userImg.data = userObj.userImg.data.toString('base64');
+      userObj.userImg.data = userObj.userImg.data.toString("base64");
     }
-    
+
+    res.status(200).json(userObj);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getUserByUserName = async (req, res) => {
+  try {
+    const user = await User.findOne({ userName: req.params.userName });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const userObj = user.toObject();
+
+    if (userObj.userImg?.data) {
+      userObj.userImg.data = userObj.userImg.data.toString("base64");
+    }
+
     res.status(200).json(userObj);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -257,4 +275,5 @@ module.exports = {
   updateProfile,
   getUserById,
   registerAdmin,
+  getUserByUserName,
 };

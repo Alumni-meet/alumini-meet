@@ -196,13 +196,6 @@
 
 .no-referrals-message {
   width: 100%;
-  text-align: center;
-  padding: 2rem;
-  background-color: #f8f9fa;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 1rem 0;
-  grid-column: 1 / -1;
 }
 
 .no-referrals-message p {

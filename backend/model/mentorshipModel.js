@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const mentorshipSchema = new mongoose.Schema({
   userId: { type: String, required: true },
+  ownerName: { type: String, required: true },
   groupTitle: { type: String, required: true },
   groupDescription: { type: String, required: true },
   followers: {
@@ -15,7 +16,7 @@ const mentorshipSchema = new mongoose.Schema({
           description: String,
           image: {
             data: Buffer,
-            contentType: String
+            contentType: String,
           },
         },
       },
