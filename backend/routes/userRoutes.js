@@ -22,7 +22,7 @@ router.post("/verifyOTP", upload.single("userImg"), verifyOTP);
 router.post("/validateUser", validateUser);
 
 // Route to update user profile
-router.put("/updateProfile/:userId", upload.single("userImg"), updateProfile);
+router.post("/updateProfile/:userId", upload.single("userImg"), updateProfile);
 
 // Route to get user by ID
 router.get("/getUser/:userId", getUserById);

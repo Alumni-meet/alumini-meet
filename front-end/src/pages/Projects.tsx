@@ -113,50 +113,59 @@ export default function Projects() {
     }
   };
 
-  // Edit a project
-  const handleEditProject = (project: Project) => {
-    setEditProjectForm(project);
-    setFormData({
-      userName: project.userName,
-      projectTitle: project.projectTitle,
-      projectDescription: project.projectDescription,
-      gitLink: project.gitLink,
-      upiQR: project.upiQR as any,
-    });
-  };
+  // Edit a project - Updated to include fundraiser state
+const handleEditProject = (project: Project) => {
+  setEditProjectForm(project);
+  setFundRaiser(!!project.upiQR); // Set fundraiser state based on existing UPI QR
+  setFormData({
+    userName: project.userName,
+    projectTitle: project.projectTitle,
+    projectDescription: project.projectDescription,
+    gitLink: project.gitLink,
+    upiQR: null, // Reset file input, keep existing image unless changed
+  });
+};
 
-  // Update a project
-  const handleUpdateProject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("projectTitle", formData.projectTitle);
-      formDataToSend.append("projectDescription", formData.projectDescription);
-      formDataToSend.append("gitLink", formData.gitLink);
-      formDataToSend.append("username", formData.userName);
-      if (formData.upiQR) {
-        formDataToSend.append("upiQR", formData.upiQR);
-      }
-      await axios.patch(
-        `${mainUrlPrefix}/project/editProject/${editProjectForm?._id}`,
-        formDataToSend,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-    } catch (error) {
-      console.error("Failed to update project:", error);
-    }finally {
-      setAddProjectForm(false);
-      setFundRaiser(false);
-      setFormData({
-        userName: userName,
-        projectTitle: "",
-        projectDescription: "",
-        gitLink: "",
-        upiQR: null,
-      });
-      fetchProjects();
+// Update a project - Fixed to properly handle file uploads
+const handleUpdateProject = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("projectTitle", formData.projectTitle);
+    formDataToSend.append("projectDescription", formData.projectDescription);
+    formDataToSend.append("gitLink", formData.gitLink);
+    formDataToSend.append("userName", formData.userName);
+    
+    // Only append UPI QR if it's a new file or we want to remove it
+    if (formData.upiQR) {
+      formDataToSend.append("upiQR", formData.upiQR);
+    } else if (!fundRaiser && editProjectForm?.upiQR) {
+      // If fundraiser is unchecked but project had UPI QR, send null to remove it
+      formDataToSend.append("upiQR", "null");
     }
-  };
+
+    await axios.patch(
+      `${mainUrlPrefix}/project/editProject/${editProjectForm?._id}`,
+      formDataToSend,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    
+    // Reset states after successful update
+    setEditProjectForm(null);
+    setFundRaiser(false);
+    setFormData({
+      userName: userName,
+      projectTitle: "",
+      projectDescription: "",
+      gitLink: "",
+      upiQR: null,
+    });
+    
+    fetchProjects();
+  } catch (error) {
+    console.error("Failed to update project:", error);
+  }
+};
 
   // Delete a project
   const handleDeleteProject = async (projectId: string) => {
@@ -231,6 +240,7 @@ export default function Projects() {
               )}
               <div>
                 <h3>{project.projectTitle}</h3>
+                <p>by  {project.userName}</p>
                 <p>{project.projectDescription}</p>
               </div>
               <a

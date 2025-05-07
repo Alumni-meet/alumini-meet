@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import "./style/Mentor.css";
 import { mainUrlPrefix } from "../main";
 
@@ -64,6 +64,7 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
   const [selectedUserName, setSelectedUserName] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profileDialog, setProfileDialog] = useState<boolean>(false);
+  const [followerElements, setFollowerElements] = useState<any[]>([]);
 
   useEffect(() => {
     if (!selectedUserName) return;
@@ -82,21 +83,54 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
     fetchUserProfile();
   }, [selectedUserName]);
 
-  const DEFAULT_AVATAR =
-  "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      const elements = await Promise.all(
+        followers.map(async (username) => {
+          try {
+            const response = await axios.get(
+              `${mainUrlPrefix}/user/getUserByUserName/${username}`
+            );
+            const user = response.data;
+            return (
+              <div
+                key={user.userName}
+                className={`follower-item ${user.role === "alumini" ? "alumni" : "user"}`}
+                onClick={() => {
+                  setSelectedUserName(user.userName);
+                  setProfileDialog(true);
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`View profile for ${user.userName}`}
+              >
+                <p title={`Visit ${user.userName}'s profile`}><strong>{user.userName}</strong></p>
+              </div>
+            );
+          } catch (e) {
+            console.error(e);
+            return null;
+          }
+        })
+      );
+      setFollowerElements(elements.filter(Boolean) as any[]);
+    };
 
+    fetchFollowers();
+  }, [followers]);
+
+  const DEFAULT_AVATAR =
+    "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
 
   const getImageUrl = (userData: User | null): string => {
     if (!userData?.userImg) return DEFAULT_AVATAR;
-    // If userImg is already a URL string
     if (typeof userData.userImg === "string") {
       return userData.userImg.startsWith("http")
         ? userData.userImg
         : DEFAULT_AVATAR;
     }
-    // If userImg is an object with data and contentType
     if (userData.userImg.data && userData.userImg.contentType) {
-      return `data:${userData.userImg.contentType};base64,${userData.userImg.data}`;
+      return `data:${userData.userImg.contentType};base64,${arrayBufferToBase64(userData.userImg.data)}`;
     }
     return DEFAULT_AVATAR;
   };
@@ -130,22 +164,8 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
               <h2>Followers</h2>
             </div>
             <div className="followers-list">
-              {followers.length > 0 ? (
-                followers.map((username) => (
-                  <div
-                    key={username}
-                    className="follower-item"
-                    onClick={() => {
-                      setSelectedUserName(username);
-                      setProfileDialog(true);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`View profile for ${username}`}
-                  >
-                    <p title={`Visit ${username}'s profile`}>{username}</p>
-                  </div>
-                ))
+              {followerElements.length > 0 ? (
+                followerElements
               ) : (
                 <p>No followers yet</p>
               )}
@@ -154,29 +174,28 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
         ) : (
           <div className="profile-container">
             <div
-            onClick={() => setProfileDialog(false)}
-            style={{
-              cursor: "pointer",
-              width: "100%",
-              position: "sticky",
-              top: "0",
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
-          </div>
+              onClick={() => setProfileDialog(false)}
+              style={{
+                cursor: "pointer",
+                width: "100%",
+                position: "sticky",
+                top: "0",
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+            </div>
             <div className="profile-card" onClick={(e) => e.stopPropagation()}>
               <img
                 src={getImageUrl(user)}
                 alt="User"
                 className="profile-img"
                 onError={(e) => {
-                  e.currentTarget.src =
-                    "https://static.vecteezy.com/system/resources/thumbnails/036/280/651/small_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg";
+                  e.currentTarget.src = DEFAULT_AVATAR;
                 }}
               />
               {user && (
                 <>
-                  <h1 className="home-title">{`${user.firstName} ${user.lastName}`}</h1>
+                  <h1>{`${user.firstName} ${user.lastName}`}</h1>
                   <p>
                     <b>User Name:</b> {user.userName}
                   </p>
@@ -190,11 +209,11 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                     <b>Bio:</b> {user.bio || "No bio available"}
                   </p>
   
-                  {user.skills!.length > 0 && (
+                  {user.skills && user.skills.length > 0 && (
                     <div>
                       <h3>Skills</h3>
                       <div className="skills">
-                        {user.skills!.map((s, i) => (
+                        {user.skills.map((s, i) => (
                           <div className="chip" key={i}>
                             {s}
                           </div>
@@ -238,11 +257,11 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                     </div>
                   )}
   
-                  {user.interests!.length > 0 && (
+                  {user.interests && user.interests.length > 0 && (
                     <div>
                       <h3>Interests</h3>
                       <div className="chip">
-                        {user.interests!.map((i, ix) => (
+                        {user.interests.map((i, ix) => (
                           <div className="interest" key={ix}>
                             {i}
                           </div>
@@ -281,7 +300,7 @@ export default function Mentorship() {
   const [postTitle, setPostTitle] = useState("");
   const [postDescription, setPostDescription] = useState("");
   const [postImage, setPostImage] = useState<File | null>(null);
-  const [editingPost, setEditingPost] = useState(null);
+  const [editingPost, setEditingPost] = useState<null | any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Group creation state
@@ -303,13 +322,12 @@ export default function Mentorship() {
       if (currentPage === "following") {
         setFollowing(response.data);
       } else {
-        setCommunity(response.data.mentorshipGroups);
-      }
-      if (response.data.message == "No mentorship groups found for this user") {
-        setCommunity([]);
+        setCommunity(response.data.mentorshipGroups || []);
       }
     } catch (e) {
       console.error("Error fetching mentorship groups:", e);
+      setCommunity([]);
+      setFollowing([]);
     }
   }
 
@@ -342,6 +360,8 @@ export default function Mentorship() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setShowAddForm(false);
+      setGroupTitle("");
+      setGroupDescription("");
       fetchGroups();
     } catch (error) {
       console.error("Error adding mentorship group:", error);
@@ -402,10 +422,10 @@ export default function Mentorship() {
     }
   };
 
-  const handleDeletePost = async (postIndex: string, groupId: string) => {
+  const handleDeletePost = async (postId: string, groupId: string) => {
     try {
       await axios.delete(
-        `${mainUrlPrefix}/mentorship/${groupId}/deletePost/${postIndex}`
+        `${mainUrlPrefix}/mentorship/${groupId}/deletePost/${postId}`
       );
       fetchGroups();
     } catch (error) {
@@ -682,7 +702,7 @@ export default function Mentorship() {
                       src={`data:${
                         post.post.image.contentType
                       };base64,${arrayBufferToBase64(
-                        post.post.image.data.data
+                        post.post.image.data
                       )}`}
                       alt="Post"
                     />

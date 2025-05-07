@@ -7,7 +7,7 @@ const companySchema = new mongoose.Schema({
   website: { type: String, required: true },
   alumni: [
     {
-      user: { type: String },
+      userName: { type: String },
       remarks: { type: String },
     }
   ],

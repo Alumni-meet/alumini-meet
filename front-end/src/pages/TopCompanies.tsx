@@ -11,34 +11,30 @@ interface Company {
   website: string;
   alumni: {
     _id: string;
+    userName: string; // Ensure this matches the model
     remarks: string;
   }[];
 }
 
 export default function TopCompanies() {
   // Retrieve user data from sessionStorage
-  const userId = sessionStorage.getItem("user") || "";
+  const userName = sessionStorage.getItem("userName") || "Unknown"; // Directly get from storage
   const alumniCompany = sessionStorage.getItem("company") || "";
   const role = sessionStorage.getItem("role") || "";
 
   // State management
   const [companies, setCompanies] = useState<Company[]>([]);
   const [remarks, setRemarks] = useState<{ [key: string]: string }>({});
-  const [activeFormCompanyId, setActiveFormCompanyId] = useState<string | null>(
-    null
-  );
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
-    null
-  );
+  const [activeFormCompanyId, setActiveFormCompanyId] = useState<string | null>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>("Unknown");
 
-  // Fetch companies on component mount
+  // Fetch companies on mount
   useEffect(() => {
     async function fetchCompanies() {
       try {
-        const response = await axios.get(`${mainUrlPrefix}/top-companies/`);
+        const response = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
         setCompanies(response.data);
         setError(null);
       } catch (error) {
@@ -51,77 +47,67 @@ export default function TopCompanies() {
     fetchCompanies();
   }, []);
 
-  // Fetch user name based on userId
-  useEffect(() => {
-    if (userId) {
-      async function fetchUserName() {
-        try {
-          const response = await axios.get(
-            `${mainUrlPrefix}/user/getUser/${userId}`
-          );
-          setUserName(response.data.firstName);
-        } catch (error) {
-          console.error("Error fetching user name:", error);
-          setError("Failed to fetch user name. Please try again.");
-        }
-      }
-      fetchUserName();
-    }
-  }, [userId]);
-
   // Handle comment submission (create or update)
-  const handleCommentSubmission = async (
-    companyId: string,
-    e: React.FormEvent
-  ) => {
+  const handleCommentSubmission = async (companyId: string, e: React.FormEvent) => {
     e.preventDefault();
     const remarkText = remarks[companyId]?.trim();
     if (!remarkText) return;
     try {
-      // Check if the user already has a comment
-      const existingComment = companies
-        .find((c) => c._id === companyId)
-        ?.alumni.find((alum) => alum._id === userId);
+      // Check existing comment by userName
+      const existingComment = companies.find(c => c._id === companyId)?.alumni.find(a => a.userName === userName);
+      
       if (existingComment) {
-        // Update existing comment via PUT
+        // Update using userName in URL
         await axios.put(
-          `${mainUrlPrefix}/top-companies/${companyId}/alumni/${userId}`,
+          `${mainUrlPrefix}/top-companies/${companyId}/alumni/${userName}`,
           { remarks: remarkText }
         );
       } else {
-        // Create new comment via POST
-        await axios.post(`${mainUrlPrefix}/top-companies/${companyId}/alumni`, {
-          user: userId,
-          remarks: remarkText,
-        });
+        // Create new comment with userName
+        await axios.post(
+          `${mainUrlPrefix}/top-companies/${companyId}/alumni`,
+          { userName, remarks: remarkText }
+        );
       }
+      
       // Refresh companies
-      setRemarks((prev) => ({ ...prev, [companyId]: "" }));
-      setActiveFormCompanyId(null);
-      const updatedCompanies = await axios.get(
-        `${mainUrlPrefix}/top-companies/`
-      );
+      const updatedCompanies = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
       setCompanies(updatedCompanies.data);
+      setRemarks(prev => ({ ...prev, [companyId]: "" }));
+      setActiveFormCompanyId(null);
     } catch (error) {
       console.error("Error handling comment:", error);
       setError("Failed to submit comment. Please try again.");
     }
   };
 
-  // Check if user can comment on a company
-  const canComment = (companyName: string) => {
-    return (
-      role.toLowerCase() === "alumini" && // Keep "alumini" as requested
-      alumniCompany.toLowerCase() === companyName.toLowerCase()
-    );
-  };
-
-  // Check if user has already commented on a company
+  // Check if user has already commented
   const hasCommented = (company: Company) => {
-    return company.alumni.some((alum) => alum._id === userId);
+    return company.alumni.some(alum => alum.userName === userName);
   };
 
-  const selectedCompany = companies.find((c) => c._id === selectedCompanyId);
+  // Check comment eligibility
+  const canComment = (companyName: string) => {
+    return role.toLowerCase() === "alumini" && alumniCompany.toLowerCase() === companyName.toLowerCase();
+  };
+
+  // Handle delete comment
+  const deleteComment = async (companyId: string, alumUserName: string) => {
+    try {
+      if (window.confirm("Are you sure you want to delete this comment?")) {
+        await axios.delete(
+          `${mainUrlPrefix}/top-companies/${companyId}/alumni/${alumUserName}`
+        );
+        const updatedCompanies = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
+        setCompanies(updatedCompanies.data);
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+      setError("Comment deletion failed");
+    }
+  };
+
+  const selectedCompany = companies.find(c => c._id === selectedCompanyId);
 
   if (loading) return <div className="loading">Loading...</div>;
 
@@ -181,15 +167,7 @@ export default function TopCompanies() {
                 top: "0",
               }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 -960 960 960"
-                width="24px"
-                fill="#222"
-              >
-                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
             </div>
             <h3>{selectedCompany.name}</h3>
             <div className="description-content">
@@ -209,13 +187,12 @@ export default function TopCompanies() {
                     <div key={index} className="alumni-comment-card">
                       <div className="comment-header">
                         <div className="user-info">
-                          <strong>{userName}</strong>
+                          <strong>{alum.userName}</strong>
                         </div>
                         <div className="comment-actions">
-                          {userId === alum._id && (
-                            <>
-                              <button
-                                className="edit-btn"
+                          {userName === alum.userName && (
+                            <div className="form-actions">
+                              {/* <button
                                 onClick={() => {
                                   setRemarks({
                                     ...remarks,
@@ -225,9 +202,10 @@ export default function TopCompanies() {
                                 }}
                               >
                                 Edit
-                              </button>
+                              </button> */}
                               <button
-                                className="delete-btn"
+                              style={{background: "none"}}
+                              title="Delete the remark"
                                 onClick={async () => {
                                   if (
                                     window.confirm(
@@ -236,11 +214,9 @@ export default function TopCompanies() {
                                   ) {
                                     try {
                                       await axios.delete(
-                                        `${mainUrlPrefix}/top-companies/${selectedCompany._id}/alumni/${alum._id}`
+                                        `${mainUrlPrefix}/top-companies/${selectedCompany._id}/alumni/${alum.userName}`
                                       );
-                                      const updatedCompanies = await axios.get(
-                                        `${mainUrlPrefix}/top-companies/`
-                                      );
+                                      const updatedCompanies = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
                                       setCompanies(updatedCompanies.data);
                                     } catch (error) {
                                       console.error(
@@ -254,9 +230,9 @@ export default function TopCompanies() {
                                   }
                                 }}
                               >
-                                Delete
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="red"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
                               </button>
-                            </>
+                            </div>
                           )}
                         </div>
                       </div>

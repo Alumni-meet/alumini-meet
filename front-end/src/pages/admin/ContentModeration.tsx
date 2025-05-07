@@ -15,6 +15,7 @@ function arrayBufferToBase64(buffer: number[]): string {
 interface Group {
   _id: string;
   groupTitle: string;
+  ownerName: string;
   groupDescription: string;
   userId: string;
   followers: string[];
@@ -139,6 +140,7 @@ export default function ContentModeration() {
             >
               <div className="nameHolder">
                 <h2>{group.groupTitle}</h2>
+                <p>by {group.ownerName}</p>
                 <p>{group.groupDescription}</p>
                 <p>
                   <strong>Followers:</strong> {group.followers.length}

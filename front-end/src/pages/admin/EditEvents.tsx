@@ -182,6 +182,7 @@ export default function Events() {
                   alt="event image"
                 />
                 <div className="event-title">{event.eventTitle}</div>
+                <div className="event-description"><p>by {(event.postedBy) ? event.postedBy : "You"}</p></div>
                 <div className="event-description">
                   {event.eventDescription}
                 </div>

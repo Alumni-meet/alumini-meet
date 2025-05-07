@@ -46,14 +46,17 @@ const UserManagement = () => {
   const handleSave = async () => {
     if (!selectedUser) return;
 
+    const updatedUser: any = { ...selectedUser };
+    delete updatedUser.userImg;
+
     try {
-      await axios.patch(
-        `${mainUrlPrefix}/user/updateUserProfile/${selectedUser._id}`,
-        selectedUser
+      await axios.post(
+        `${mainUrlPrefix}/user/updateProfile/${updatedUser._id}`,
+        updatedUser
       );
       setUsers(
         users.map((user) =>
-          user._id === selectedUser._id ? selectedUser : user
+          user._id === updatedUser._id ? updatedUser : user
         )
       );
       setIsModalOpen(false);

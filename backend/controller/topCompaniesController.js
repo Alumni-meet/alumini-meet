@@ -3,13 +3,12 @@ const Company = require("../model/topCompanyModel");
 exports.getCompany = async (req, res) => {
   try {
     const response = await Company.find();
-    res.status(201).json(response);
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Company CRUD operations
 exports.addCompany = async (req, res) => {
   try {
     const newCompany = await Company.create(req.body);
@@ -24,7 +23,7 @@ exports.updateCompany = async (req, res) => {
     const updatedCompany = await Company.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true },
+      { new: true, runValidators: true }
     );
 
     if (!updatedCompany)
@@ -46,14 +45,13 @@ exports.deleteCompany = async (req, res) => {
   }
 };
 
-// Alumni Remarks Operations
 exports.addRemarks = async (req, res) => {
   try {
     const company = await Company.findById(req.params.companyId);
     if (!company) return res.status(404).json({ message: "Company not found" });
 
     company.alumni.push({
-      userId: req.body.userId,
+      userName: req.body.userName,
       remarks: req.body.remarks,
     });
 
@@ -70,7 +68,7 @@ exports.updateRemarks = async (req, res) => {
     if (!company) return res.status(404).json({ message: "Company not found" });
 
     const alumniIndex = company.alumni.findIndex(
-      (a) => a.userId === req.params.userId,
+      (a) => a.userName === req.params.userName,
     );
 
     if (alumniIndex === -1)
@@ -83,27 +81,24 @@ exports.updateRemarks = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 exports.deleteRemarks = async (req, res) => {
   try {
-    const { companyId, userId } = req.params;
+    const { companyId, userName } = req.params;
 
-    // Find the company by _id
     const company = await Company.findById(companyId);
 
     if (!company) {
       return res.status(404).json({ message: "Company not found" });
     }
 
-    // Filter out the alumni remark where user matches the provided userId
     const initialAlumni = company.alumni;
-    company.alumni = company.alumni.filter((alum) => alum.user !== userId);
+    company.alumni = company.alumni.filter((alum) => alum.userName !== userName);
 
-    // Check if any changes were made
     if (initialAlumni.length === company.alumni.length) {
       return res.status(404).json({ message: "Remark not found" });
     }
 
-    // Save the updated company
     await company.save();
 
     res.json({ message: "Remark deleted successfully" });
@@ -115,16 +110,38 @@ exports.deleteRemarks = async (req, res) => {
 
 exports.deleteRemarksAdmin = async (req, res) => {
   try {
-    const { Id } = req.params;
-    const company = await Company.findById(req.params.companyId);
+    const { companyId, alumniId } = req.params;
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      return res.status(404).json({ 
+        status: "error",
+        message: "Company not found" 
+      });
+    }
+
     const initialLength = company.alumni.length;
-    company.alumni = company.alumni.filter((a) => a._Id !== Id);
+    company.alumni = company.alumni.filter(a => a._id.toString() !== alumniId);
 
     if (initialLength === company.alumni.length) {
-      return res.status(404).json({ message: "Remarks not found" });
+      return res.status(404).json({ 
+        status: "error",
+        message: "Alumni remark not found" 
+      });
     }
 
     await company.save();
-    res.json({ message: "Remarks deleted successfully" });
-  } catch (err) {}
+    
+    res.status(200).json({ 
+      status: "success",
+      message: "Remark deleted successfully",
+      data: company
+    });
+  } catch (error) {
+    console.error("Error deleting remark:", error);
+    res.status(500).json({ 
+      status: "error",
+      message: error.message || "Internal server error"
+    });
+  }
 };

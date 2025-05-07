@@ -7,6 +7,7 @@ interface Alumni {
   _id: string;
   user: string;
   remarks: string;
+  userName: string;
 }
 
 interface Company {
@@ -88,6 +89,7 @@ export default function EditTopCompanies() {
       setCompanies((prev) => prev.filter((c) => c._id !== id));
       setSuccessMessage("Company deleted successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
+      fetchData()
     } catch (err: any) {
       setError(
         "Delete failed: " + (err.response?.data?.message || err.message),
@@ -98,37 +100,43 @@ export default function EditTopCompanies() {
   };
 
   const handleDeleteComment = async (companyId: string, alumniId: string) => {
-    if (!window.confirm("Are you sure you want to delete this comment?"))
+    if (!window.confirm("Are you sure you want to delete this comment?")) {
       return;
+    }
+    
     setLoading(true);
     try {
-      const company = companies.find((c) => c._id === companyId);
-      const alumni = company?.alumni.find((a) => a._id === alumniId);
-      if (!alumni) throw new Error("Alumni comment not found");
-
-      await axios.delete(
-        `${mainUrlPrefix}/top-companies/${companyId}/admin-delete/${alumni.user}`,
+      const response = await axios.delete(
+        `${mainUrlPrefix}/top-companies/${companyId}/admin-delete/${alumniId}`
       );
-
-      setCompanies((prev) =>
-        prev.map((company) =>
-          company._id === companyId
-            ? {
-                ...company,
-                alumni: company.alumni.filter((a) => a._id !== alumniId),
-              }
-            : company,
-        ),
-      );
-      setSuccessMessage("Comment deleted successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000);
+  
+      if (response.data.status === "success") {
+        setCompanies(prev =>
+          prev.map(company =>
+            company._id === companyId
+              ? {
+                  ...company,
+                  alumni: company.alumni.filter(a => a._id !== alumniId),
+                }
+              : company
+          )
+        );
+        setSuccessMessage("Comment deleted successfully!");
+      } else {
+        throw new Error(response.data.message || "Failed to delete comment");
+      }
     } catch (err: any) {
       setError(
-        "Failed to delete comment: " +
-          (err.response?.data?.message || err.message),
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to delete comment"
       );
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        setSuccessMessage("");
+        setError("");
+      }, 3000);
     }
   };
 
@@ -269,6 +277,7 @@ export default function EditTopCompanies() {
               <div className="comments-list">
                 {selectedCompany.alumni.map((alumni) => (
                   <div key={alumni._id} className="comment-card">
+                    <p className="comment-text">{alumni.userName}</p>
                     <p className="comment-text">"{alumni.remarks}"</p>
                     <button
                       className="delete-comment-btn"

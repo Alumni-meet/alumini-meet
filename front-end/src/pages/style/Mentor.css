@@ -260,13 +260,15 @@ textarea {
 .follower-item {
   height: fit-content;
   word-break: break-all;
-  display: grid;
-  place-items: center;
-  border-bottom: 1px solid #9e9e9e55;
+  border: 1px solid #9e9e9e55;
   cursor: pointer;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: .2s all ease;
 }
-.follower-item:last-child{
-  border-bottom: none;
+
+.follower-item:hover{
+  background-color: #22222211;
 }
 .dialog-header {
   display: flex;
@@ -286,4 +288,12 @@ textarea {
 
 .close-button:hover {
   color: #333;
+}
+.follower-item.alumni::before{
+  content: "Alumni";
+  width: 100%;
+
+}
+.follower-item.user{
+  background-color: red;
 }

@@ -114,40 +114,53 @@ const deleteProject = async (req, res) => {
 const editProject = async (req, res) => {
   try {
     const { projectId } = req.params;
+    const { projectTitle, projectDescription, gitLink, userName } = req.body;
+    
+    // Create the base update object with fields that are always present
     const updatedProject = {
-      projectTitle: req.body.projectTitle,
-      projectDescription: req.body.projectDescription,
-      gitLink: req.body.gitLink,
-      upiQR: req.body.upiQR,
-      userName: req.body.userName
+      projectTitle,
+      projectDescription,
+      gitLink,
+      userName
     };
     
-     if (req.files && req.files.upiQR) {
+    // Handle UPI QR image if provided
+    if (req.files && req.files.upiQR) {
       const upiQRFile = req.files.upiQR[0];
       updatedProject.upiQR = {
         data: upiQRFile.buffer,
         contentType: upiQRFile.mimetype
       };
+    } else if (req.body.upiQR === 'null' || req.body.upiQR === '') {
+      // Handle case where UPI QR should be removed
+      updatedProject.upiQR = undefined;
     }
+    // If req.body.upiQR contains a string (existing image URL), it will be preserved
 
-    const result = await Project.findByIdAndUpdate(projectId, updatedProject, {
-      new: true,
-    });
+    const result = await Project.findByIdAndUpdate(
+      projectId, 
+      updatedProject, 
+      { new: true }
+    );
+
     if (!result) {
       return res.status(404).json({
         status: "failure",
-        message: "project not found.",
+        message: "Project not found",
       });
     }
 
     res.status(200).json({
-      status: "Success",
-      message: "project details editted successfully.",
+      status: "success",
+      message: "Project updated successfully",
+      data: result
     });
   } catch (error) {
+    console.error("Error editing project:", error);
     res.status(500).json({
       status: "failure",
-      message: "project details cannot be editted.",
+      message: "Failed to update project",
+      error: error.message
     });
   }
 };
