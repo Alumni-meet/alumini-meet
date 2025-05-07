@@ -91,21 +91,21 @@ export default function TopCompanies() {
     return role.toLowerCase() === "alumini" && alumniCompany.toLowerCase() === companyName.toLowerCase();
   };
 
-  // Handle delete comment
-  const deleteComment = async (companyId: string, alumUserName: string) => {
-    try {
-      if (window.confirm("Are you sure you want to delete this comment?")) {
-        await axios.delete(
-          `${mainUrlPrefix}/top-companies/${companyId}/alumni/${alumUserName}`
-        );
-        const updatedCompanies = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
-        setCompanies(updatedCompanies.data);
-      }
-    } catch (error) {
-      console.error("Delete failed:", error);
-      setError("Comment deletion failed");
-    }
-  };
+  // // Handle delete comment
+  // const deleteComment = async (companyId: string, alumUserName: string) => {
+  //   try {
+  //     if (window.confirm("Are you sure you want to delete this comment?")) {
+  //       await axios.delete(
+  //         `${mainUrlPrefix}/top-companies/${companyId}/alumni/${alumUserName}`
+  //       );
+  //       const updatedCompanies = await axios.get<Company[]>(`${mainUrlPrefix}/top-companies/`);
+  //       setCompanies(updatedCompanies.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Delete failed:", error);
+  //     setError("Comment deletion failed");
+  //   }
+  // };
 
   const selectedCompany = companies.find(c => c._id === selectedCompanyId);
 

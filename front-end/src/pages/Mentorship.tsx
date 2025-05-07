@@ -1,5 +1,5 @@
 import axios from "axios";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./style/Mentor.css";
 import { mainUrlPrefix } from "../main";
 
