@@ -197,10 +197,6 @@ export default function Placement() {
                       {atsResult.ats_score}
                     </span>
                   </p>
-                  <p className="missingWords">
-                    <b>Missing keywords:</b>{" "}
-                    <span>{atsResult.missing_keywords.join(", ")}</span>
-                  </p>
                 </div>
               )
             )}

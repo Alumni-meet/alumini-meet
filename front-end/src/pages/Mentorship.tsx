@@ -22,6 +22,7 @@ interface Group {
   followers: string[];
   posts: {
     _id: string;
+    likes: string[];
     post: {
       title: string;
       description: string;
@@ -343,6 +344,17 @@ export default function Mentorship() {
       fetchGroups();
     } catch (error) {
       console.error("Error following/unfollowing group:", error);
+    }
+  };
+
+  const toggleLike = async (groupId: string, postId: string) => {
+    try {
+      await axios.post(
+        `${mainUrlPrefix}/mentorship/like/${groupId}/${postId}/${userName}`
+      );
+      fetchGroups();
+    } catch (error) {
+      console.error("Error toggling like:", error);
     }
   };
 
@@ -711,46 +723,68 @@ export default function Mentorship() {
                     <h1>{post.post.title.toUpperCase()}</h1>
                     <p>{post.post.description}</p>
                   </div>
-                  {role === "alumini" && selectedGroup.userId === userId && (
-                    <div className="post-actions">
-                      <button
-                        title="Edit the post"
-                        onClick={() => {
-                          setEditingPost(post);
-                          setPostTitle(post.post.title);
-                          setPostDescription(post.post.description);
-                          setShowPostForm(true);
-                          setPostIndex(index);
-                        }}
+                  <div className="post-actions">
+                    <button
+                      className="like-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(selectedGroup._id, post._id);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="0 -960 960 960"
+                        width="24px"
+                        fill={post.likes?.includes(userName) ? "#ff0000" : "#e3e3e3"}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#e3e3e3"
+                        <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
+                      </svg>
+                      <span>{post.likes?.length || 0}</span>
+                    </button>
+                    {role === "alumini" && selectedGroup.userId === userId && (
+                      <>
+                        <button
+                          title="Edit the post"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingPost(post);
+                            setPostTitle(post.post.title);
+                            setPostDescription(post.post.description);
+                            setShowPostForm(true);
+                            setPostIndex(index);
+                          }}
                         >
-                          <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
-                        </svg>
-                      </button>
-                      <button
-                        title="Delete the post"
-                        onClick={() =>
-                          handleDeletePost(post._id, selectedGroup._id)
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#e3e3e3"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e3e3e3"
+                          >
+                            <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                          </svg>
+                        </button>
+                        <button
+                          title="Delete the post"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePost(post._id, selectedGroup._id);
+                          }}
                         >
-                          <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="24px"
+                            viewBox="0 -960 960 960"
+                            width="24px"
+                            fill="#e3e3e3"
+                          >
+                            <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (

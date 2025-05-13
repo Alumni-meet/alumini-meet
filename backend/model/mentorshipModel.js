@@ -7,10 +7,21 @@ const mentorshipSchema = new mongoose.Schema({
   groupDescription: { type: String, required: true },
   followers: {
     type: [String],
+    default: [],
   },
   posts: {
     type: [
       {
+        likes: {
+          type: [String],
+          default: [],
+          set: function (likes) {
+            return Array.from(likes || []);
+          },
+          get: function (likes) {
+            return new Set(likes);
+          },
+        },
         post: {
           title: String,
           description: String,

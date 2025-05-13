@@ -155,13 +155,13 @@ export default function Profile() {
         }
       });
       // Append arrays
-      data.append("skills", JSON.stringify(skills));
-      data.append("interests", JSON.stringify(interests));
+      data.append("skills", skills as any);
+      data.append("interests", interests as any);
       // Append file if selected
       if (selectedFile) {
         data.append("userImg", selectedFile);
       }
-      await axios.put(`${mainUrlPrefix}/user/updateProfile/${userId}`, data, {
+      await axios.post(`${mainUrlPrefix}/user/updateProfile/${userId}`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       // Refetch updated data

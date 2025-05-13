@@ -9,7 +9,7 @@ export default function Navbar() {
   const role = sessionStorage.getItem("role");
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user");
+    sessionStorage.clear();
     console.log("User logged out");
     navigate("/login"); // Redirect to the login page after logout
   };
