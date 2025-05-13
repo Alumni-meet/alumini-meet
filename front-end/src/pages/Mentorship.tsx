@@ -22,7 +22,6 @@ interface Group {
   followers: string[];
   posts: {
     _id: string;
-    likes: string[];
     post: {
       title: string;
       description: string;
@@ -96,7 +95,9 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
             return (
               <div
                 key={user.userName}
-                className={`follower-item ${user.role === "alumini" ? "alumni" : "user"}`}
+                className={`follower-item ${
+                  user.role === "alumini" ? "alumni" : "user"
+                }`}
                 onClick={() => {
                   setSelectedUserName(user.userName);
                   setProfileDialog(true);
@@ -105,7 +106,9 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                 tabIndex={0}
                 aria-label={`View profile for ${user.userName}`}
               >
-                <p title={`Visit ${user.userName}'s profile`}><strong>{user.userName}</strong></p>
+                <p title={`Visit ${user.userName}'s profile`}>
+                  <strong>{user.userName}</strong>
+                </p>
               </div>
             );
           } catch (e) {
@@ -131,7 +134,9 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
         : DEFAULT_AVATAR;
     }
     if (userData.userImg.data && userData.userImg.contentType) {
-      return `data:${userData.userImg.contentType};base64,${arrayBufferToBase64(userData.userImg.data)}`;
+      return `data:${userData.userImg.contentType};base64,${arrayBufferToBase64(
+        userData.userImg.data
+      )}`;
     }
     return DEFAULT_AVATAR;
   };
@@ -159,7 +164,15 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                 top: "0",
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#222"
+              >
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
             </div>
             <div className="dialog-header">
               <h2>Followers</h2>
@@ -183,7 +196,15 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                 top: "0",
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#222"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 -960 960 960"
+                width="24px"
+                fill="#222"
+              >
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+              </svg>
             </div>
             <div className="profile-card" onClick={(e) => e.stopPropagation()}>
               <img
@@ -209,7 +230,7 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                   <p>
                     <b>Bio:</b> {user.bio || "No bio available"}
                   </p>
-  
+
                   {user.skills && user.skills.length > 0 && (
                     <div>
                       <h3>Skills</h3>
@@ -222,7 +243,7 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                       </div>
                     </div>
                   )}
-  
+
                   {(user.linkedIn || user.github || user.twitter) && (
                     <div>
                       <h3>Social Links</h3>
@@ -257,7 +278,7 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                       </div>
                     </div>
                   )}
-  
+
                   {user.interests && user.interests.length > 0 && (
                     <div>
                       <h3>Interests</h3>
@@ -270,7 +291,7 @@ const FollowersDialog: React.FC<FollowersDialogProps> = ({
                       </div>
                     </div>
                   )}
-  
+
                   {user.companyName && (
                     <p>
                       <b>Company:</b> {user.companyName}
@@ -303,6 +324,7 @@ export default function Mentorship() {
   const [postImage, setPostImage] = useState<File | null>(null);
   const [editingPost, setEditingPost] = useState<null | any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [like, setLike] = useState(false);
 
   // Group creation state
   const [groupTitle, setGroupTitle] = useState("");
@@ -344,17 +366,6 @@ export default function Mentorship() {
       fetchGroups();
     } catch (error) {
       console.error("Error following/unfollowing group:", error);
-    }
-  };
-
-  const toggleLike = async (groupId: string, postId: string) => {
-    try {
-      await axios.post(
-        `${mainUrlPrefix}/mentorship/like/${groupId}/${postId}/${userName}`
-      );
-      fetchGroups();
-    } catch (error) {
-      console.error("Error toggling like:", error);
     }
   };
 
@@ -448,6 +459,18 @@ export default function Mentorship() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setPostImage(e.target.files[0]);
+    }
+  };
+
+  const handleLike = async (groupId: string, postId: any) => {
+    try {
+      await axios.post(
+        `${mainUrlPrefix}/mentorship/likes/${groupId}/${postId}/${userName}`
+      );
+      console.log("THis is the valuessss ====> "+postId+ " "+ groupId)
+      fetchGroups();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -713,9 +736,7 @@ export default function Mentorship() {
                     <img
                       src={`data:${
                         post.post.image.contentType
-                      };base64,${arrayBufferToBase64(
-                        post.post.image.data
-                      )}`}
+                      };base64,${arrayBufferToBase64(post.post.image.data)}`}
                       alt="Post"
                     />
                   )}
@@ -725,29 +746,27 @@ export default function Mentorship() {
                   </div>
                   <div className="post-actions">
                     <button
-                      className="like-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleLike(selectedGroup._id, post._id);
-                      }}
+                      onClick={() => handleLike(selectedGroup._id, index)}
+                      className={`like-button ${
+                        post.likes.includes(userName) ? "liked" : ""
+                      }`}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         height="24px"
                         viewBox="0 -960 960 960"
                         width="24px"
-                        fill={post.likes?.includes(userName) ? "#ff0000" : "#e3e3e3"}
+                        fill={post.likes.includes(userName) ? "red" : "#e3e3e3"}
                       >
-                        <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Zm0-108q96-86 158-147.5t98-107q36-45.5 50-81t14-70.5q0-60-40-100t-100-40q-47 0-87 26.5T518-680h-76q-15-41-55-67.5T300-774q-60 0-100 40t-40 100q0 35 14 70.5t50 81q36 45.5 98 107T480-228Zm0-273Z"/>
+                        <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Z" />
                       </svg>
-                      <span>{post.likes?.length || 0}</span>
+                      <span>{post.likes.length}</span>
                     </button>
                     {role === "alumini" && selectedGroup.userId === userId && (
                       <>
                         <button
                           title="Edit the post"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          onClick={() => {
                             setEditingPost(post);
                             setPostTitle(post.post.title);
                             setPostDescription(post.post.description);
@@ -767,10 +786,9 @@ export default function Mentorship() {
                         </button>
                         <button
                           title="Delete the post"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletePost(post._id, selectedGroup._id);
-                          }}
+                          onClick={() =>
+                            handleDeletePost(post._id, selectedGroup._id)
+                          }
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

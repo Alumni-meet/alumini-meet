@@ -139,7 +139,7 @@ async function AddPost(req, res) {
     }
 
     const newPost = {
-      likes: new Set(), // Initialize likes as a Set
+      likes: [],
       post: {
         title,
         description,
@@ -196,45 +196,42 @@ async function EditPost(req, res) {
   }
 }
 
-// Like or unlike a post
 async function ToggleLike(req, res) {
   try {
     const { groupId, postIndex, userName } = req.params;
-
     const mentorship = await Mentorship.findById(groupId);
     if (!mentorship) {
       return res.status(404).json({ message: "Mentorship group not found" });
     }
-
     const index = parseInt(postIndex);
     if (index >= mentorship.posts.length) {
       return res.status(400).json({ message: "Invalid post index" });
     }
-
     const post = mentorship.posts[index];
-    
-    // Initialize likes as Set if it doesn't exist
+    // Initialize likes as an array if it doesn't exist
     if (!post.likes) {
-      post.likes = new Set();
+      post.likes = [];
     }
-
     // Check if user already liked the post
-    if (post.likes.has(userName)) {
+    const isLiked = post.likes.includes(userName);
+
+    if (isLiked) {
       // Unlike: Remove user from likes
-      post.likes.delete(userName);
+      post.likes = post.likes.filter(like => like !== userName);
     } else {
       // Like: Add user to likes
-      post.likes.add(userName);
+      post.likes.push(userName);
     }
 
     await mentorship.save();
 
     res.json({
-      message: post.likes.has(userName) ? "Post liked successfully" : "Post unliked successfully",
-      likes: Array.from(post.likes) // Convert Set to Array for response
+      message: isLiked ? "Post unliked successfully" : "Post liked successfully",
+      likes: post.likes,
+      likeCount: post.likes.length
     });
   } catch (error) {
-    res.status(500).json({ message: "Failed to toggle like", error: error.message });
+    res.status(500).json({ message: "Error toggling like", error: error.message });
   }
 }
 

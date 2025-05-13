@@ -1,5 +1,4 @@
 const express = require("express");
-const { upload } = require("../controller/mentorshipController"); // Import multer instance
 const {
   AddGroup,
   EditGroup,
@@ -10,7 +9,9 @@ const {
   DeleteGroup,
   AddPost,
   EditPost,
-  DeletePost
+  DeletePost,
+  upload, 
+  ToggleLike
 } = require("../controller/mentorshipController");
 
 const router = express.Router();
@@ -25,6 +26,9 @@ router.delete("/delete/:id", DeleteGroup);
 
 /** ---------------------- FOLLOW ROUTE ---------------------- */
 router.post("/follow/:groupId/:userName", ToggleFollow);
+
+/** ---------------------- LIKE ROUTE ---------------------- */
+router.post("/likes/:groupId/:postId/:userName", ToggleLike)
 
 /** ---------------------- POSTS ROUTES ---------------------- */
 router.post("/:groupId/addPost", upload.single("file"), AddPost);
