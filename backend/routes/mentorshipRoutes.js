@@ -28,7 +28,7 @@ router.delete("/delete/:id", DeleteGroup);
 router.post("/follow/:groupId/:userName", ToggleFollow);
 
 /** ---------------------- LIKE ROUTE ---------------------- */
-router.post("/likes/:groupId/:postId/:userName", ToggleLike)
+router.post("/likes/:groupId/:postIndex/:userName", ToggleLike)
 
 /** ---------------------- POSTS ROUTES ---------------------- */
 router.post("/:groupId/addPost", upload.single("file"), AddPost);

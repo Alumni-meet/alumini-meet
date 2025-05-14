@@ -15,12 +15,6 @@ const mentorshipSchema = new mongoose.Schema({
         likes: {
           type: [String],
           default: [],
-          set: function (likes) {
-            return Array.from(likes || []);
-          },
-          get: function (likes) {
-            return new Set(likes);
-          },
         },
         post: {
           title: String,

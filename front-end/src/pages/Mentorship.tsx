@@ -462,13 +462,11 @@ export default function Mentorship() {
     }
   };
 
-  const handleLike = async (groupId: string, postId: any) => {
+  const handleLike = async (groupId: string, postIndex: number) => {
     try {
       await axios.post(
-        `${mainUrlPrefix}/mentorship/likes/${groupId}/${postId}/${userName}`
+        `${mainUrlPrefix}/mentorship/likes/${groupId}/${postIndex}/${userName}`
       );
-      console.log("THis is the valuessss ====> "+postId+ " "+ groupId)
-      fetchGroups();
     } catch (error) {
       console.error(error);
     }
@@ -736,7 +734,9 @@ export default function Mentorship() {
                     <img
                       src={`data:${
                         post.post.image.contentType
-                      };base64,${arrayBufferToBase64(post.post.image.data)}`}
+                      };base64,${arrayBufferToBase64(
+                        post.post.image.data.data
+                      )}`}
                       alt="Post"
                     />
                   )}
@@ -756,7 +756,7 @@ export default function Mentorship() {
                         height="24px"
                         viewBox="0 -960 960 960"
                         width="24px"
-                        fill={post.likes.includes(userName) ? "red" : "#e3e3e3"}
+                        fill={post.likes.includes(userName) ? "red" : "#fff"}
                       >
                         <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Z" />
                       </svg>

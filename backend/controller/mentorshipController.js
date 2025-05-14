@@ -1,4 +1,5 @@
 const Mentorship = require("../model/mentorshipModel");
+const mongoose = require("mongoose");
 const multer = require("multer");
 
 // Multer configuration to handle file uploads
@@ -9,7 +10,14 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Add a new mentorship group with an initial post
 async function AddGroup(req, res) {
   try {
-    const { userId, groupTitle, groupDescription, title, description, ownerName } = req.body;
+    const {
+      userId,
+      groupTitle,
+      groupDescription,
+      title,
+      description,
+      ownerName,
+    } = req.body;
 
     // Validate required fields
     if (!userId || !groupTitle || !groupDescription) {
@@ -39,9 +47,19 @@ async function AddGroup(req, res) {
     });
 
     await newMentorship.save();
-    res.status(201).json({ message: "Mentorship group created successfully", newMentorship });
+    res
+      .status(201)
+      .json({
+        message: "Mentorship group created successfully",
+        newMentorship,
+      });
   } catch (error) {
-    res.status(500).json({ message: "Failed to create mentorship group", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to create mentorship group",
+        error: error.message,
+      });
   }
 }
 
@@ -61,9 +79,17 @@ async function EditGroup(req, res) {
       return res.status(404).json({ message: "Mentorship group not found" });
     }
 
-    res.json({ message: "Mentorship group updated successfully", updatedMentorship });
+    res.json({
+      message: "Mentorship group updated successfully",
+      updatedMentorship,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to edit mentorship group", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to edit mentorship group",
+        error: error.message,
+      });
   }
 }
 
@@ -71,19 +97,27 @@ async function EditGroup(req, res) {
 async function GetAllGroup(req, res) {
   try {
     const mentorshipGroups = await Mentorship.find();
-    
+
     // Convert Sets to Arrays for response
-    const formattedGroups = mentorshipGroups.map(group => ({
+    const formattedGroups = mentorshipGroups.map((group) => ({
       ...group._doc,
-      posts: group.posts.map(post => ({
+      posts: group.posts.map((post) => ({
         ...post._doc,
-        likes: Array.from(post.likes || [])
-      }))
+        likes: Array.from(post.likes || []),
+      })),
     }));
-    
-    res.json({ message: "Mentorship groups fetched successfully", mentorshipGroups: formattedGroups });
+
+    res.json({
+      message: "Mentorship groups fetched successfully",
+      mentorshipGroups: formattedGroups,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch mentorship groups", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch mentorship groups",
+        error: error.message,
+      });
   }
 }
 
@@ -94,21 +128,31 @@ async function GetGroupByUserId(req, res) {
     const mentorshipGroups = await Mentorship.find({ userId: userId });
 
     if (mentorshipGroups.length === 0) {
-      return res.status(200).json({ message: "No mentorship groups found for this user" });
+      return res
+        .status(200)
+        .json({ message: "No mentorship groups found for this user" });
     }
 
     // Convert Sets to Arrays for response
-    const formattedGroups = mentorshipGroups.map(group => ({
+    const formattedGroups = mentorshipGroups.map((group) => ({
       ...group._doc,
-      posts: group.posts.map(post => ({
+      posts: group.posts.map((post) => ({
         ...post._doc,
-        likes: Array.from(post.likes || [])
-      }))
+        likes: Array.from(post.likes || []),
+      })),
     }));
 
-    res.json({ message: "Mentorship groups fetched successfully", mentorshipGroups: formattedGroups });
+    res.json({
+      message: "Mentorship groups fetched successfully",
+      mentorshipGroups: formattedGroups,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch mentorship groups", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch mentorship groups",
+        error: error.message,
+      });
   }
 }
 
@@ -121,7 +165,12 @@ async function DeleteGroup(req, res) {
     }
     res.json({ message: "Mentorship group deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete mentorship group", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Failed to delete mentorship group",
+        error: error.message,
+      });
   }
 }
 
@@ -157,7 +206,9 @@ async function AddPost(req, res) {
 
     res.status(201).json({ message: "Post added successfully", mentorship });
   } catch (error) {
-    res.status(500).json({ message: "Failed to add post", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to add post", error: error.message });
   }
 }
 
@@ -192,46 +243,84 @@ async function EditPost(req, res) {
     await mentorship.save();
     res.json({ message: "Post updated successfully", updatedPost: post });
   } catch (error) {
-    res.status(500).json({ message: "Failed to edit post", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to edit post", error: error.message });
   }
 }
 
 async function ToggleLike(req, res) {
   try {
+    // Validate parameters
     const { groupId, postIndex, userName } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(groupId)) {
+      return res.status(400).json({ message: "Invalid group ID" });
+    }
+    if (!userName || typeof userName !== "string") {
+      return res.status(400).json({ message: "Invalid username" });
+    }
+
+    // Convert and validate postIndex
+    const index = postIndex;
+    if (isNaN(index) || index < 0) {
+      return res.status(400).json({ message: "Invalid post index" });
+    }
+
+    // Find mentorship group
     const mentorship = await Mentorship.findById(groupId);
     if (!mentorship) {
       return res.status(404).json({ message: "Mentorship group not found" });
     }
-    const index = parseInt(postIndex);
+
+    // Validate post index
     if (index >= mentorship.posts.length) {
-      return res.status(400).json({ message: "Invalid post index" });
+      return res.status(400).json({
+        message: "Invalid post index",
+        availablePosts: mentorship.posts.length,
+      });
     }
+
+    // Get the post and ensure likes array exists
     const post = mentorship.posts[index];
-    // Initialize likes as an array if it doesn't exist
-    if (!post.likes) {
+    if (!Array.isArray(post.likes)) {
       post.likes = [];
     }
-    // Check if user already liked the post
-    const isLiked = post.likes.includes(userName);
+
+    // Toggle like status
+    const userIndex = post.likes.indexOf(userName);
+    const isLiked = userIndex != -1;
 
     if (isLiked) {
-      // Unlike: Remove user from likes
-      post.likes = post.likes.filter(like => like !== userName);
+      post.likes.splice(userIndex, 1);
     } else {
-      // Like: Add user to likes
       post.likes.push(userName);
     }
 
-    await mentorship.save();
+    mentorship.posts[index] = post;
 
+    // Save changes
+    const updatedMentorship = await mentorship.save();
+
+    // Return the updated post data
+    const updatedPost = updatedMentorship.posts[index];
     res.json({
-      message: isLiked ? "Post unliked successfully" : "Post liked successfully",
-      likes: post.likes,
-      likeCount: post.likes.length
+      success: true,
+      message: isLiked
+        ? "Post unliked successfully"
+        : "Post liked successfully",
+      data: {
+        isLiked: !isLiked,
+        likes: updatedPost.likes,
+        likeCount: updatedPost.likes.length,
+        postId: updatedPost._id,
+      },
     });
   } catch (error) {
-    res.status(500).json({ message: "Error toggling like", error: error.message });
+    console.error("Error in ToggleLike:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
 
@@ -262,7 +351,9 @@ async function DeletePost(req, res) {
 
     res.json({ message: "Post deleted successfully", mentorship });
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete post", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to delete post", error: error.message });
   }
 }
 
@@ -274,16 +365,18 @@ async function GetFollowedGroups(req, res) {
     const followedGroups = await Mentorship.find({ followers: userId });
 
     if (followedGroups.length === 0) {
-      return res.status(200).json({ message: "No followed mentorship groups found." });
+      return res
+        .status(200)
+        .json({ message: "No followed mentorship groups found." });
     }
 
     // Convert Sets to Arrays for response
-    const formattedGroups = followedGroups.map(group => ({
+    const formattedGroups = followedGroups.map((group) => ({
       ...group._doc,
-      posts: group.posts.map(post => ({
+      posts: group.posts.map((post) => ({
         ...post._doc,
-        likes: Array.from(post.likes || [])
-      }))
+        likes: Array.from(post.likes || []),
+      })),
     }));
 
     res.json(formattedGroups);
@@ -306,7 +399,9 @@ async function ToggleFollow(req, res) {
 
     if (isFollowing) {
       // Unfollow: Remove user from followers
-      mentorship.followers = mentorship.followers.filter((id) => id !== userName);
+      mentorship.followers = mentorship.followers.filter(
+        (id) => id !== userName
+      );
     } else {
       // Follow: Add user to followers
       mentorship.followers.push(userName);
@@ -315,7 +410,9 @@ async function ToggleFollow(req, res) {
     await mentorship.save();
 
     res.json({
-      message: isFollowing ? "Unfollowed successfully" : "Followed successfully",
+      message: isFollowing
+        ? "Unfollowed successfully"
+        : "Followed successfully",
       mentorship,
     });
   } catch (error) {
@@ -332,8 +429,8 @@ module.exports = {
   AddPost,
   EditPost,
   DeletePost,
-  ToggleLike, 
+  ToggleLike,
   GetFollowedGroups,
   ToggleFollow,
-  upload, 
+  upload,
 };
