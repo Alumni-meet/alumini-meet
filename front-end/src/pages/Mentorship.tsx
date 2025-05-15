@@ -25,6 +25,7 @@ interface Group {
     post: {
       title: string;
       description: string;
+      likes: string[];
       image?: {
         data: number[];
         contentType: string;
@@ -324,7 +325,6 @@ export default function Mentorship() {
   const [postImage, setPostImage] = useState<File | null>(null);
   const [editingPost, setEditingPost] = useState<null | any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [like, setLike] = useState(false);
 
   // Group creation state
   const [groupTitle, setGroupTitle] = useState("");
@@ -467,8 +467,9 @@ export default function Mentorship() {
       await axios.post(
         `${mainUrlPrefix}/mentorship/likes/${groupId}/${postIndex}/${userName}`
       );
+      fetchGroups();
     } catch (error) {
-      console.error(error);
+      console.error("Error liking the post:", error);
     }
   };
 
@@ -756,7 +757,9 @@ export default function Mentorship() {
                         height="24px"
                         viewBox="0 -960 960 960"
                         width="24px"
-                        fill={post.likes.includes(userName) ? "red" : "#fff"}
+                        fill={
+                          post.likes.includes(userName) ? "#F95454" : "#fff"
+                        }
                       >
                         <path d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Z" />
                       </svg>
@@ -873,4 +876,27 @@ export default function Mentorship() {
       )}
     </div>
   );
+}
+function post(
+  value: {
+    _id: string;
+    post: {
+      title: string;
+      description: string;
+      likes: string[];
+      image?: { data: number[]; contentType: string } | undefined;
+    };
+  },
+  index: number,
+  array: {
+    _id: string;
+    post: {
+      title: string;
+      description: string;
+      likes: string[];
+      image?: { data: number[]; contentType: string } | undefined;
+    };
+  }[]
+): unknown {
+  throw new Error("Function not implemented.");
 }
