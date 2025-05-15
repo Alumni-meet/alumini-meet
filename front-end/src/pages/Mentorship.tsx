@@ -877,26 +877,3 @@ export default function Mentorship() {
     </div>
   );
 }
-function post(
-  value: {
-    _id: string;
-    post: {
-      title: string;
-      description: string;
-      likes: string[];
-      image?: { data: number[]; contentType: string } | undefined;
-    };
-  },
-  index: number,
-  array: {
-    _id: string;
-    post: {
-      title: string;
-      description: string;
-      likes: string[];
-      image?: { data: number[]; contentType: string } | undefined;
-    };
-  }[]
-): unknown {
-  throw new Error("Function not implemented.");
-}
